@@ -1,0 +1,34 @@
+import { Request, Response, NextFunction } from 'express'
+import { AccessControl } from 'accesscontrol'
+import { User } from '~/models/user.model'
+import ErrorResponse from '~/core/error.response'
+import { StatusCodes } from 'http-status-codes'
+import { getRolesService } from '~/services/rbac.service'
+
+let ac: AccessControl
+const initializeAccessControl = async () => {
+  const grantList = await getRolesService()
+  ac = new AccessControl(grantList)
+}
+initializeAccessControl()
+
+const checkPermission = (action: string, resource: string) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = await User.findById(req.userId)
+      if (!user) {
+        throw new ErrorResponse(StatusCodes.UNAUTHORIZED, 'User not found')
+      }
+      const role = user.role
+      const permission = ac.can(role)[action](resource)
+      if (!permission.granted) {
+        throw new ErrorResponse(StatusCodes.FORBIDDEN, 'Permission denied')
+      }
+      next()
+    } catch (error) {
+      next(error)
+    }
+  }
+}
+
+export default checkPermission
