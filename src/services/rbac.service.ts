@@ -1,5 +1,5 @@
 import { StatusCodes } from 'http-status-codes'
-import ErrorResponse from '~/core/error.response'
+import ErrorResponse, { ERROR_MESSAGES } from '~/core/error.response'
 import { IResource, Resource } from '~/models/resource.model'
 import { IRole, Role } from '~/models/role.model'
 import { createRoleValidation } from '~/validations/rbac.validation'
@@ -7,7 +7,7 @@ import { createRoleValidation } from '~/validations/rbac.validation'
 const createResourceService = async (resource: IResource) => {
   const resourceInDb = await Resource.findOne({ resource_name: resource.resource_name })
   if (resourceInDb) {
-    throw new ErrorResponse(StatusCodes.BAD_REQUEST, 'Resource already exists')
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.RESOURCE_ALREADY_EXIST)
   }
   const newResource = await Resource.create(resource)
   return newResource
@@ -20,7 +20,7 @@ const createRoleService = async (role: IRole) => {
   }
   const roleInDb = await Role.findOne({ role_name: role.role_name })
   if (roleInDb) {
-    throw new ErrorResponse(StatusCodes.BAD_REQUEST, 'Role already exists')
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.ROLE_ALREADY_EXIST)
   }
   const newRole = await Role.create(role)
   return newRole

@@ -2,7 +2,7 @@ import dotenv from 'dotenv'
 import { OtpLog } from '~/models/otp.model'
 import sendMailTemplate from '~/utils/mail.template'
 import transporter from '~/configs/mailer.init'
-import ErrorResponse from '~/core/error.response'
+import ErrorResponse, { ERROR_MESSAGES } from '~/core/error.response'
 import { StatusCodes } from 'http-status-codes'
 import { User } from '~/models/user.model'
 import { generateToken } from './auth.service'
@@ -32,23 +32,23 @@ const sendMailVerification = async (email: string) => {
     }
     return transporter.sendMail(mailOptions)
   } catch (e) {
-    throw new ErrorResponse(StatusCodes.BAD_REQUEST, 'Please check your email to verify your account and try again...')
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.CHECK_EMAIL)
   }
 }
 
 const verifyAccount = async (otpToken: string, email: string) => {
   const otp = await OtpLog.findOne({ otp_email: email }).lean()
   if (!otp) {
-    throw new ErrorResponse(StatusCodes.BAD_REQUEST, 'Invalid OTP token')
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.INVALID_OTP)
   }
   const isValid = await bcrypt.compare(otpToken, otp.otp_token)
   await OtpLog.deleteOne({ otp_email: email })
   if (!isValid) {
-    throw new ErrorResponse(StatusCodes.BAD_REQUEST, 'Invalid OTP token')
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.INVALID_OTP)
   }
   const user = await User.findOneAndUpdate({ email }, { isActivated: true }, { new: true })
   if (!user) {
-    throw new ErrorResponse(StatusCodes.BAD_REQUEST, 'User not found')
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_FOUND)
   }
   const accessToken = generateToken({
     id: user._id,

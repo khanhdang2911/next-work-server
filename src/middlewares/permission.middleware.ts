@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import { AccessControl } from 'accesscontrol'
 import { User } from '~/models/user.model'
-import ErrorResponse from '~/core/error.response'
-import { StatusCodes } from 'http-status-codes'
+import ErrorResponse, { ERROR_MESSAGES } from '~/core/error.response'
+import { ReasonPhrases, StatusCodes } from 'http-status-codes'
 import { getRolesService } from '~/services/rbac.service'
 
 let ac: AccessControl
@@ -17,12 +17,12 @@ const checkPermission = (action: string, resource: string) => {
     try {
       const user = await User.findById(req.userId)
       if (!user) {
-        throw new ErrorResponse(StatusCodes.UNAUTHORIZED, 'User not found')
+        throw new ErrorResponse(StatusCodes.UNAUTHORIZED, ERROR_MESSAGES.USER_NOT_FOUND)
       }
       const role = user.role
       const permission = ac.can(role)[action](resource)
       if (!permission.granted) {
-        throw new ErrorResponse(StatusCodes.FORBIDDEN, 'Permission denied')
+        throw new ErrorResponse(StatusCodes.FORBIDDEN, ReasonPhrases.FORBIDDEN)
       }
       next()
     } catch (error) {
