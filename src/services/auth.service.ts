@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import { ReasonPhrases, StatusCodes } from 'http-status-codes'
-import ErrorResponse from '~/core/error.response'
+import ErrorResponse, { ERROR_MESSAGES } from '~/core/error.response'
 import { IUser, User } from '~/models/user.model'
 import { registerValidation } from '~/validations/auth.validation'
 
@@ -42,15 +42,12 @@ const validateTokenV2 = async (token: string) => {
 }
 const loginService = async (email: string, password: string) => {
   const user = await User.findOne({ email })
-  if (!user) throw new ErrorResponse(StatusCodes.BAD_REQUEST, 'Email or password is wrong.')
+  if (!user) throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.INVALID_CREDENTIALS)
   const validPassword = await bcrypt.compare(password, user.password)
-  if (!validPassword) throw new ErrorResponse(StatusCodes.BAD_REQUEST, 'Email or password is wrong.')
+  if (!validPassword) throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.INVALID_CREDENTIALS)
   if (!user.isActivated) {
     await sendMailVerification(email)
-    throw new ErrorResponse(
-      StatusCodes.BAD_REQUEST,
-      'Your account is not activated, please check your email to activate account and try again.'
-    )
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.ACCOUNT_NOT_ACTIVATED)
   }
   const accessToken = generateToken({
     id: user._id,
@@ -71,7 +68,7 @@ const registerService = async (data: IUser) => {
   const { error } = await registerValidation(data)
   if (error) throw new ErrorResponse(StatusCodes.BAD_REQUEST, error.message)
   const checkUserIsExist = await User.findOne({ email: data.email })
-  if (checkUserIsExist) throw new ErrorResponse(StatusCodes.BAD_REQUEST, 'Email is already exist.')
+  if (checkUserIsExist) throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.EMAIL_ALREADY_EXIST)
   const hashedPassword = await hashPassword(data.password)
   const newUser = await User.create({
     ...data,
@@ -81,17 +78,16 @@ const registerService = async (data: IUser) => {
 }
 const logoutService = async (userId: string, req: Request) => {
   const user = await User.findById(userId)
-  if (!user) throw new ErrorResponse(StatusCodes.BAD_REQUEST, 'User not found')
+  if (!user) throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_FOUND)
   if (user.refreshToken != req.cookies.refreshToken)
-    throw new ErrorResponse(StatusCodes.BAD_REQUEST, 'Refresh token is not valid')
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ReasonPhrases.UNAUTHORIZED)
   return true
 }
 
 const generateRefreshTokenService = async (refreshToken: string, userId: string) => {
   const user = await User.findById(userId)
-  if (!user) throw new ErrorResponse(StatusCodes.BAD_REQUEST, 'User not found')
-  if (user.refreshToken !== refreshToken)
-    throw new ErrorResponse(StatusCodes.UNAUTHORIZED, 'ReasonPhrases.UNAUTHORIZED')
+  if (!user) throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_FOUND)
+  if (user.refreshToken !== refreshToken) throw new ErrorResponse(StatusCodes.UNAUTHORIZED, ReasonPhrases.UNAUTHORIZED)
   const payload = { id: user._id, email: user.email, firstname: user.firstname, lastname: user.lastname }
   const newAccessToken = generateToken(payload)
   return {
@@ -112,7 +108,7 @@ const loginWithAuth0Service = async (user: any) => {
       auth0Id: user.sub
     })
   }
-  const accessToken = await generateToken({
+  const accessToken = generateToken({
     id: userInDb._id,
     email: userInDb.email,
     firstname: userInDb.firstname,
