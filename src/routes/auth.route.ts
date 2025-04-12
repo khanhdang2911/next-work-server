@@ -1,9 +1,9 @@
 import { Router } from 'express'
 import { generateRefreshToken, Login, LoginWithAuth0, Logout, Register } from '~/controllers/auth.controller'
-import asyncErrorHandler from '~/helpers/asyncErrorHandler'
+import asyncErrorHandler from '~/helpers/async-error-handler'
 import authMiddleware from '~/middlewares/auth.middleware'
 import auth0Middleware from '~/middlewares/auth0.middleware'
-import authV2Middleware from '~/middlewares/authV2.middleware'
+import authV2Middleware from '~/middlewares/auth-v2.middleware'
 
 const authRouter = Router()
 

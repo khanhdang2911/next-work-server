@@ -1,5 +1,6 @@
 import { StatusCodes } from 'http-status-codes'
-import ErrorResponse, { ERROR_MESSAGES } from '~/core/error.response'
+import ErrorResponse from '~/core/error.response'
+import ERROR_MESSAGES from '~/core/error-message'
 import { IResource, Resource } from '~/models/resource.model'
 import { IRole, Role } from '~/models/role.model'
 import { createRoleValidation } from '~/validations/rbac.validation'

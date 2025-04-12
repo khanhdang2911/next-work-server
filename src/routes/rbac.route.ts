@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { createResource, createRole, getResources, getRoles } from '~/controllers/rbac.controller'
-import asyncErrorHandler from '~/helpers/asyncErrorHandler'
+import asyncErrorHandler from '~/helpers/async-error-handler'
 
 const rbacRouter = Router()
 rbacRouter.post('/resource', asyncErrorHandler(createResource))

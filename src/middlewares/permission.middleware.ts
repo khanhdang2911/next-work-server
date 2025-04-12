@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import { AccessControl } from 'accesscontrol'
 import { User } from '~/models/user.model'
-import ErrorResponse, { ERROR_MESSAGES } from '~/core/error.response'
+import ErrorResponse from '~/core/error.response'
+import ERROR_MESSAGES from '~/core/error-message'
 import { ReasonPhrases, StatusCodes } from 'http-status-codes'
 import { getRolesService } from '~/services/rbac.service'
 
