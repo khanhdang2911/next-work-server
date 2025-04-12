@@ -1,14 +1,16 @@
 import { Request } from 'express'
 import { ReasonPhrases, StatusCodes } from 'http-status-codes'
-import ErrorResponse, { ERROR_MESSAGES } from '~/core/error.response'
+import ErrorResponse from '~/core/error.response'
+import ERROR_MESSAGES from '~/core/error-message'
 import { IUser, User } from '~/models/user.model'
-import { registerValidation } from '~/validations/auth.validation'
+import { loginValidation, registerValidation } from '~/validations/auth.validation'
 
 import dotenv from 'dotenv'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import randtoken from 'rand-token'
 import { sendMailVerification } from './mail.service'
+import { cleanedMessage } from '~/utils/common'
 dotenv.config()
 
 const hashPassword = async (password: string) => {
@@ -41,6 +43,8 @@ const validateTokenV2 = async (token: string) => {
   }
 }
 const loginService = async (email: string, password: string) => {
+  const { error } = loginValidation({ email, password })
+  if (error) throw new ErrorResponse(StatusCodes.BAD_REQUEST, cleanedMessage(error.message))
   const user = await User.findOne({ email })
   if (!user) throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.INVALID_CREDENTIALS)
   const validPassword = await bcrypt.compare(password, user.password)
@@ -65,8 +69,8 @@ const loginService = async (email: string, password: string) => {
   return { ...userWithoutPassword, accessToken }
 }
 const registerService = async (data: IUser) => {
-  const { error } = await registerValidation(data)
-  if (error) throw new ErrorResponse(StatusCodes.BAD_REQUEST, error.message)
+  const { error } = registerValidation(data)
+  if (error) throw new ErrorResponse(StatusCodes.BAD_REQUEST, cleanedMessage(error.message))
   const checkUserIsExist = await User.findOne({ email: data.email })
   if (checkUserIsExist) throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.EMAIL_ALREADY_EXIST)
   const hashedPassword = await hashPassword(data.password)

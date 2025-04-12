@@ -1,8 +1,9 @@
 import dotenv from 'dotenv'
 import { OtpLog } from '~/models/otp.model'
-import sendMailTemplate from '~/utils/mail.template'
+import sendMailVerifyTemplate from '~/utils/mail-verify.template'
 import transporter from '~/configs/mailer.init'
-import ErrorResponse, { ERROR_MESSAGES } from '~/core/error.response'
+import ErrorResponse from '~/core/error.response'
+import ERROR_MESSAGES from '~/core/error-message'
 import { StatusCodes } from 'http-status-codes'
 import { User } from '~/models/user.model'
 import { generateToken } from './auth.service'
@@ -28,7 +29,7 @@ const sendMailVerification = async (email: string) => {
       from: process.env.MAIL_USER,
       to: email,
       subject: 'Verify Your Email',
-      html: sendMailTemplate(email, verificationLink)
+      html: sendMailVerifyTemplate(email, verificationLink)
     }
     return transporter.sendMail(mailOptions)
   } catch (e) {

@@ -1,7 +1,8 @@
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { MAX_AGE } from '~/constants/common.constant'
-import SuccessResponse, { SUCCESS_MESSAGES } from '~/core/success.response'
+import SuccessResponse from '~/core/success.response'
+import SUCCESS_MESSAGES from '~/core/success-message'
 import {
   generateRefreshTokenService,
   loginService,

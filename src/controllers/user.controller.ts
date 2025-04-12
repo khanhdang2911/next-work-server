@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import SuccessResponse, { SUCCESS_MESSAGES } from '~/core/success.response'
+import SuccessResponse from '~/core/success.response'
+import SUCCESS_MESSAGES from '~/core/success-message'
 import { getALlUsersService, searchUserService } from '~/services/user.service'
 const getAllUsers = async (req: Request, res: Response) => {
   const users = await getALlUsersService()

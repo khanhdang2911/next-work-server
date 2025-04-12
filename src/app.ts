@@ -1,6 +1,6 @@
 import express from 'express'
 import cors from 'cors'
-import { handleError, handleNotFound } from './middlewares/handleError'
+import { handleError, handleNotFound } from './middlewares/handle-error'
 import router from './routes'
 import cookieParser from 'cookie-parser'
 import dotenv from 'dotenv'

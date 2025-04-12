@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { getAllUsers, searchUser } from '~/controllers/user.controller'
-import asyncErrorHandler from '~/helpers/asyncErrorHandler'
+import asyncErrorHandler from '~/helpers/async-error-handler'
 import authMiddleware from '~/middlewares/auth.middleware'
 import checkPermission from '~/middlewares/permission.middleware'
 

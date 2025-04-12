@@ -1,6 +1,6 @@
 import Joi from 'joi'
 
-const createRoleValidation = async (data: object) => {
+const createRoleValidation = (data: object) => {
   const schema = Joi.object({
     role_name: Joi.string().required(),
     role_description: Joi.string().required(),
@@ -14,7 +14,7 @@ const createRoleValidation = async (data: object) => {
       )
       .required()
   })
-  return await schema.validateAsync(data)
+  return schema.validate(data)
 }
 
 export { createRoleValidation }

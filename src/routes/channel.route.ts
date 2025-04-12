@@ -1,0 +1,12 @@
+import { Router } from 'express'
+
+const channelRouter = Router()
+import * as channelController from '~/controllers/channel.controller'
+import asyncErrorHandler from '~/helpers/async-error-handler'
+import authMiddleware from '~/middlewares/auth.middleware'
+channelRouter.use(asyncErrorHandler(authMiddleware))
+
+// create channel
+channelRouter.post('/:workspaceId', asyncErrorHandler(channelController.createChannel))
+
+export default channelRouter

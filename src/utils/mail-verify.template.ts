@@ -1,4 +1,4 @@
-const sendMailTemplate = (email: string, verificationLink: string) => {
+const sendMailVerifyTemplate = (email: string, verificationLink: string) => {
   return `
         <!DOCTYPE html>
         <html lang="en">
@@ -7,12 +7,12 @@ const sendMailTemplate = (email: string, verificationLink: string) => {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Verify Your Email</title>
             <style>
-                body { 
-                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-                    background-color: #f0f2f5; 
-                    margin: 0; 
-                    padding: 20px; 
-                    color: #333; 
+                body {
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    background-color: #f0f2f5;
+                    margin: 0;
+                    padding: 20px;
+                    color: #333;
                 }
                 .email-wrapper {
                     max-width: 650px;
@@ -31,31 +31,31 @@ const sendMailTemplate = (email: string, verificationLink: string) => {
                 .email-header img {
                     max-height: 50px;
                 }
-                .container { 
-                    max-width: 600px; 
-                    margin: 20px auto; 
-                    background: #ffffff; 
-                    padding: 30px; 
+                .container {
+                    max-width: 600px;
+                    margin: 20px auto;
+                    background: #ffffff;
+                    padding: 30px;
                     border-radius: 12px;
-                    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); 
-                    text-align: center; 
+                    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+                    text-align: center;
                 }
                 .logo {
                     margin-bottom: 20px;
                 }
-                .header { 
-                    font-size: 28px; 
-                    font-weight: bold; 
-                    color: #1c1e21; 
-                    margin-bottom: 20px; 
+                .header {
+                    font-size: 28px;
+                    font-weight: bold;
+                    color: #1c1e21;
+                    margin-bottom: 20px;
                     border-bottom: 2px solid #f0f2f5;
                     padding-bottom: 15px;
                 }
-                .content { 
-                    font-size: 16px; 
+                .content {
+                    font-size: 16px;
                     line-height: 1.6;
-                    color: #4b4f56; 
-                    margin-bottom: 25px; 
+                    color: #4b4f56;
+                    margin-bottom: 25px;
                     text-align: left;
                     padding: 0 10px;
                 }
@@ -69,34 +69,34 @@ const sendMailTemplate = (email: string, verificationLink: string) => {
                     font-weight: bold;
                     color: #b45309;
                 }
-                .verify-btn { 
-                    display: inline-block; 
-                    padding: 14px 30px; 
-                    font-size: 16px; 
-                    text-decoration: none; 
-                    border-radius: 6px; 
-                    font-weight: bold; 
+                .verify-btn {
+                    display: inline-block;
+                    padding: 14px 30px;
+                    font-size: 16px;
+                    text-decoration: none;
+                    border-radius: 6px;
+                    font-weight: bold;
                     transition: all 0.3s ease;
                     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
                 }
-                .verify-btn:hover { 
+                .verify-btn:hover {
                     background:rgb(192, 211, 235);
                     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
                 }
-                .footer { 
-                    font-size: 14px; 
-                    color: #8d949e; 
-                    margin-top: 30px; 
+                .footer {
+                    font-size: 14px;
+                    color: #8d949e;
+                    margin-top: 30px;
                     padding-top: 20px;
                     border-top: 1px solid #dddfe2;
                 }
-                .footer a { 
-                    color: #1877f2; 
-                    text-decoration: none; 
+                .footer a {
+                    color: #1877f2;
+                    text-decoration: none;
                     font-weight: bold;
                 }
-                .footer a:hover { 
-                    text-decoration: underline; 
+                .footer a:hover {
+                    text-decoration: underline;
                 }
                 .social-links {
                     margin-top: 20px;
@@ -170,4 +170,4 @@ const sendMailTemplate = (email: string, verificationLink: string) => {
     `
 }
 
-export default sendMailTemplate
+export default sendMailVerifyTemplate
