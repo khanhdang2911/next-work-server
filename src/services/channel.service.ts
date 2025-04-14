@@ -2,9 +2,11 @@ import { StatusCodes } from 'http-status-codes'
 import ErrorResponse from '~/core/error.response'
 import ERROR_MESSAGES from '~/core/error-message'
 import { Channel, IChannel, IChannelMember } from '~/models/channel.model'
-import { Workspace } from '~/models/workspace.model'
 import { cleanedMessage, convertToObjectId } from '~/utils/common'
 import * as channelValidation from '~/validations/channel.validation'
+import * as workspaceRepo from '~/repositories/workspace.repo'
+import { User } from '~/models/user.model'
+import * as channelRepo from '~/repositories/channel.repo'
 const createChannelService = async (userId: string, workspaceId: string, data: IChannel) => {
   const { error } = channelValidation.validateCreateChannel(data)
   if (error) {
@@ -12,21 +14,14 @@ const createChannelService = async (userId: string, workspaceId: string, data: I
   }
   const wsId = convertToObjectId(workspaceId)
   const uId = convertToObjectId(userId)
-  const checkUserInWorkspace = await Workspace.exists({
-    _id: wsId,
-    members: {
-      $elemMatch: {
-        user: uId
-      }
-    }
-  })
+  const checkUserInWorkspace = await workspaceRepo.checkUserAlreadyInWorkspace(wsId, uId)
   if (!checkUserInWorkspace) {
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_IN_WORKSPACE)
   }
   const checkIsExistChannel = await Channel.exists({
     name: data.name,
     workspaceId: wsId
-  })
+  }).lean()
   if (checkIsExistChannel) {
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.CHANNEL_EXISTED)
   }
@@ -43,4 +38,56 @@ const createChannelService = async (userId: string, workspaceId: string, data: I
   return channel
 }
 
-export { createChannelService }
+const inviteUserToChannelService = async (
+  userId: string,
+  workspaceId: string,
+  channelId: string,
+  data: { email: string }
+) => {
+  const { error } = channelValidation.validateInviteUserToChannel(data)
+  if (error) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, cleanedMessage(error.message))
+  }
+  const wsId = convertToObjectId(workspaceId)
+  const cId = convertToObjectId(channelId)
+  const uId = convertToObjectId(userId)
+  const checkUserInWorkspace = await workspaceRepo.checkUserAlreadyInWorkspace(wsId, uId)
+  if (!checkUserInWorkspace) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_IN_WORKSPACE)
+  }
+  const checkUserInChannel = await channelRepo.checkUserAlreadyInChannel(wsId, cId, uId)
+  if (!checkUserInChannel) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_IN_CHANNEL)
+  }
+  const checkChannelInWorkspace = await workspaceRepo.checkChannelInWorkspace(wsId, cId)
+  if (!checkChannelInWorkspace) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.CHANNEL_NOT_FOUND)
+  }
+  const invitedUser = await User.exists({ email: data.email }).lean()
+  if (!invitedUser) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_FOUND)
+  }
+  const checkInvitedUserInChannel = await channelRepo.checkUserAlreadyInChannel(wsId, cId, invitedUser._id)
+  if (checkInvitedUserInChannel) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_ALREADY_IN_CHANNEL)
+  }
+  const checkInvitedUserInWorkspace = await workspaceRepo.checkUserAlreadyInWorkspace(wsId, invitedUser._id)
+  if (!checkInvitedUserInWorkspace) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_IN_WORKSPACE)
+  }
+  await Channel.updateMany(
+    {
+      _id: cId,
+      workspaceId: wsId
+    },
+    {
+      $addToSet: {
+        members: {
+          user: invitedUser._id,
+          joinedAt: new Date()
+        }
+      }
+    }
+  )
+}
+export { createChannelService, inviteUserToChannelService }

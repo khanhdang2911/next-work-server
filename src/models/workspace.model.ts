@@ -13,6 +13,10 @@ interface IWorkspace {
   admin: Types.ObjectId
   members?: IWorkspaceMember[]
 }
+interface IInviteUserData {
+  email: string
+  channels?: string[]
+}
 const WorkspaceMemberSchema = new Schema<IWorkspaceMember>(
   {
     user: {
@@ -29,6 +33,7 @@ const WorkspaceMemberSchema = new Schema<IWorkspaceMember>(
     _id: false
   }
 )
+
 const WorkspaceSchema = new Schema<IWorkspace>(
   {
     name: {
@@ -57,4 +62,4 @@ const WorkspaceSchema = new Schema<IWorkspace>(
 )
 
 const Workspace = mongoose.model<IWorkspace>(DOCUMENT_NAME, WorkspaceSchema)
-export { Workspace, IWorkspace, IWorkspaceMember }
+export { Workspace, IWorkspace, IWorkspaceMember, IInviteUserData }

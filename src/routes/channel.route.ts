@@ -8,5 +8,5 @@ channelRouter.use(asyncErrorHandler(authMiddleware))
 
 // create channel
 channelRouter.post('/:workspaceId', asyncErrorHandler(channelController.createChannel))
-
+channelRouter.post('/:workspaceId/:channelId/invite', asyncErrorHandler(channelController.inviteUserToChannel))
 export default channelRouter

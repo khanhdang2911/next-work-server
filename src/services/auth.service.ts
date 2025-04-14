@@ -4,7 +4,6 @@ import ErrorResponse from '~/core/error.response'
 import ERROR_MESSAGES from '~/core/error-message'
 import { IUser, User } from '~/models/user.model'
 import { loginValidation, registerValidation } from '~/validations/auth.validation'
-
 import dotenv from 'dotenv'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
@@ -56,8 +55,7 @@ const loginService = async (email: string, password: string) => {
   const accessToken = generateToken({
     id: user._id,
     email: user.email,
-    firstname: user.firstname,
-    lastname: user.lastname
+    name: user.name
   })
   const refreshToken = randtoken.generate(Number(process.env.JWT_REFRESH_TOKEN_SIZE) || 64)
   user.refreshToken = refreshToken
@@ -92,7 +90,7 @@ const generateRefreshTokenService = async (refreshToken: string, userId: string)
   const user = await User.findById(userId)
   if (!user) throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_FOUND)
   if (user.refreshToken !== refreshToken) throw new ErrorResponse(StatusCodes.UNAUTHORIZED, ReasonPhrases.UNAUTHORIZED)
-  const payload = { id: user._id, email: user.email, firstname: user.firstname, lastname: user.lastname }
+  const payload = { id: user._id, email: user.email, name: user.name }
   const newAccessToken = generateToken(payload)
   return {
     ...payload,
@@ -106,8 +104,7 @@ const loginWithAuth0Service = async (user: any) => {
   if (!userInDb) {
     userInDb = await User.create({
       email: user.email,
-      firstname: user.given_name,
-      lastname: user.family_name,
+      name: user.name,
       avatar: user.picture,
       auth0Id: user.sub
     })
@@ -115,8 +112,7 @@ const loginWithAuth0Service = async (user: any) => {
   const accessToken = generateToken({
     id: userInDb._id,
     email: userInDb.email,
-    firstname: userInDb.firstname,
-    lastname: userInDb.lastname
+    name: userInDb.name
   })
   const refreshToken = randtoken.generate(Number(process.env.JWT_REFRESH_TOKEN_SIZE) || 64)
   userInDb.refreshToken = refreshToken

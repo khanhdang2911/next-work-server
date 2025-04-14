@@ -4,6 +4,7 @@ import asyncErrorHandler from '~/helpers/async-error-handler'
 import authMiddleware from '~/middlewares/auth.middleware'
 const workspaceRouter = Router()
 
+workspaceRouter.get('/:workspaceId/accept-invitation/:token', asyncErrorHandler(workspaceController.acceptInvitation))
 workspaceRouter.use(asyncErrorHandler(authMiddleware))
 //Authenticating the user before accessing the route
 workspaceRouter.post('/', asyncErrorHandler(workspaceController.createWorkspace))

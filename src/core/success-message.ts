@@ -18,7 +18,9 @@ const SUCCESS_MESSAGES = {
   CREATE_WORKSPACE_SUCCESS: 'Create workspace successfully.',
   GET_ALL_WORKSPACE_SUCCESS: 'Get all workspace successfully.',
   INVITE_USER_TO_WORKSPACE_SUCCESS: 'Invite user to workspace successfully.',
+  ACCEPT_INVITATION_SUCCESS: 'Accept invitation successfully.',
   // channel
-  CREATE_CHANNEL_SUCCESS: 'Create channel successfully.'
+  CREATE_CHANNEL_SUCCESS: 'Create channel successfully.',
+  INVITE_USER_TO_CHANNEL_SUCCESS: 'Invite user to channel successfully.'
 }
 export default SUCCESS_MESSAGES
