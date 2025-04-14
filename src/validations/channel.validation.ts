@@ -7,5 +7,10 @@ const validateCreateChannel = (data: object) => {
   })
   return schema.validate(data)
 }
-
-export { validateCreateChannel }
+const validateInviteUserToChannel = (data: object) => {
+  const schema = Joi.object({
+    email: Joi.string().email().required()
+  })
+  return schema.validate(data)
+}
+export { validateCreateChannel, validateInviteUserToChannel }

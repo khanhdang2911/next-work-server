@@ -10,4 +10,12 @@ const validateCreateWorkspace = (data: object) => {
   return schema.validate(data)
 }
 
-export { validateCreateWorkspace }
+const validateInviteUserToWorkspace = (data: object) => {
+  const schema = Joi.object({
+    email: Joi.string().email().required(),
+    channels: Joi.array().items(Joi.string()).required()
+  })
+  return schema.validate(data)
+}
+
+export { validateCreateWorkspace, validateInviteUserToWorkspace }

@@ -1,12 +1,11 @@
 import mongoose, { Schema } from 'mongoose'
-import { ROLES } from '~/constants/common.constant'
+import { GENDER, ROLES } from '~/constants/common.constant'
 
 const COLLECTION_NAME = 'users'
 const DOCUMENT_NAME = 'user'
 
 interface IUser {
-  firstname: string
-  lastname: string
+  name: string
   email: string
   password: string
   refreshToken: string
@@ -20,11 +19,7 @@ interface IUser {
 
 const UserSchema = new Schema<IUser>(
   {
-    firstname: {
-      type: String,
-      required: true
-    },
-    lastname: {
+    name: {
       type: String,
       required: true
     },
@@ -43,7 +38,7 @@ const UserSchema = new Schema<IUser>(
     gender: {
       type: String,
       required: false,
-      enum: ['Male', 'Female']
+      enum: GENDER
     },
     avatar: {
       type: String,
@@ -72,5 +67,5 @@ const UserSchema = new Schema<IUser>(
 )
 
 const User = mongoose.model<IUser>(DOCUMENT_NAME, UserSchema)
-UserSchema.index({ firstname: 'text', lastname: 'text', email: 'text' })
+UserSchema.index({ name: 'text', email: 'text' })
 export { User, IUser }

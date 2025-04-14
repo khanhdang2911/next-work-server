@@ -3,7 +3,6 @@ import { StatusCodes } from 'http-status-codes'
 import SuccessResponse from '~/core/success.response'
 import SUCCESS_MESSAGES from '~/core/success-message'
 import * as workspaceService from '~/services/workspace.service'
-import * as channelService from '~/services/channel.service'
 const createWorkspace = async (req: Request, res: Response) => {
   const userId = req.userId
   const data = req.body
@@ -19,8 +18,14 @@ const getAllWorkspace = async (req: Request, res: Response) => {
 const inviteUserToWorkspace = async (req: Request, res: Response) => {
   const userId = req.userId
   const { workspaceId } = req.params
-  const { email } = req.body
-  await workspaceService.inviteUserToWorkspaceService(workspaceId, userId, email)
+  const data = req.body
+  await workspaceService.inviteUserToWorkspaceService(workspaceId, userId, data)
   new SuccessResponse(StatusCodes.OK, SUCCESS_MESSAGES.INVITE_USER_TO_WORKSPACE_SUCCESS).send(res)
 }
-export { createWorkspace, getAllWorkspace, inviteUserToWorkspace, createChannel }
+const acceptInvitation = async (req: Request, res: Response) => {
+  const token = req.params.token
+  const { workspaceId } = req.params
+  await workspaceService.acceptInvitationService(token, workspaceId)
+  new SuccessResponse(StatusCodes.OK, SUCCESS_MESSAGES.ACCEPT_INVITATION_SUCCESS).send(res)
+}
+export { createWorkspace, getAllWorkspace, inviteUserToWorkspace, acceptInvitation }

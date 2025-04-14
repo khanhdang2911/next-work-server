@@ -10,7 +10,7 @@ const searchUserService = async (keyword: string, userId: string) => {
     $text: {
       $search: keyword
     }
-  }).select('firstname lastname email avatar gender')
+  }).select('name email avatar gender')
   return users.filter((user) => user._id.toString() !== userId)
 }
 export { getALlUsersService, searchUserService }

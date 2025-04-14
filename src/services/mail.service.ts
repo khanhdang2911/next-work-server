@@ -54,8 +54,7 @@ const verifyAccount = async (otpToken: string, email: string) => {
   const accessToken = generateToken({
     id: user._id,
     email: user.email,
-    firstname: user.firstname,
-    lastname: user.lastname
+    name: user.name,
   })
   const refreshToken = randtoken.generate(Number(process.env.JWT_REFRESH_TOKEN_SIZE) || 64)
   user.refreshToken = refreshToken
