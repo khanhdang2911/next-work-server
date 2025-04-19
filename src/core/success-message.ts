@@ -21,6 +21,10 @@ const SUCCESS_MESSAGES = {
   ACCEPT_INVITATION_SUCCESS: 'Accept invitation successfully.',
   // channel
   CREATE_CHANNEL_SUCCESS: 'Create channel successfully.',
-  INVITE_USER_TO_CHANNEL_SUCCESS: 'Invite user to channel successfully.'
+  INVITE_USER_TO_CHANNEL_SUCCESS: 'Invite user to channel successfully.',
+  // message
+  SEND_MESSAGE_SUCCESS: 'Send message successfully.',
+  //conversation
+  CREATE_CONVERSATION_SUCCESS: 'Create conversation successfully.'
 }
 export default SUCCESS_MESSAGES

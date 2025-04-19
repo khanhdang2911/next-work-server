@@ -4,7 +4,9 @@ import rbacRouter from './rbac.route'
 import mailRouter from './mail.route'
 import workspaceRouter from './workspace.route'
 import channelRouter from './channel.route'
+import conversationRouter from './conversation.route'
 import { Router } from 'express'
+import messageRouter from './message.route'
 
 const router = Router()
 router.use('/auth', authRouter)
@@ -13,6 +15,8 @@ router.use('/rbac', rbacRouter)
 router.use('/mail', mailRouter)
 router.use('/workspaces', workspaceRouter)
 router.use('/channels', channelRouter)
+router.use('/messages', messageRouter)
+router.use('/conversations', conversationRouter)
 router.use('/', (req, res) => {
   res.send('Hello World!')
 })

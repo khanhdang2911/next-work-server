@@ -55,7 +55,7 @@ const inviteUserToChannelService = async (
   if (!checkUserInWorkspace) {
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_IN_WORKSPACE)
   }
-  const checkUserInChannel = await channelRepo.checkUserAlreadyInChannel(wsId, cId, uId)
+  const checkUserInChannel = await channelRepo.checkUserAlreadyInChannel(cId, uId)
   if (!checkUserInChannel) {
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_IN_CHANNEL)
   }
@@ -67,7 +67,7 @@ const inviteUserToChannelService = async (
   if (!invitedUser) {
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_FOUND)
   }
-  const checkInvitedUserInChannel = await channelRepo.checkUserAlreadyInChannel(wsId, cId, invitedUser._id)
+  const checkInvitedUserInChannel = await channelRepo.checkUserAlreadyInChannel(cId, invitedUser._id)
   if (checkInvitedUserInChannel) {
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_ALREADY_IN_CHANNEL)
   }
