@@ -1,6 +1,5 @@
 import { Types } from 'mongoose'
 import { Channel } from '~/models/channel.model'
-import { User } from '~/models/user.model'
 import { Workspace } from '~/models/workspace.model'
 
 const checkChannelsInWorkspace = async (workspaceId: Types.ObjectId, channels: Types.ObjectId[]) => {

@@ -1,0 +1,40 @@
+import { StatusCodes } from 'http-status-codes'
+import ErrorResponse from '~/core/error.response'
+import { Message } from '~/models/message.model'
+import { cleanedMessage, convertToObjectId } from '~/utils/common'
+import * as messageValidation from '~/validations/message.validation'
+import ERROR_MESSAGES from '~/core/error-message'
+import { Conversation } from '~/models/conversation.model'
+import { CONVERSATION_TYPE } from '~/constants/common.constant'
+import * as channelRepo from '~/repositories/channel.repo'
+import { MessageDTO } from '~/dtos/message.dto'
+const createMessageService = async (userId: string, data: MessageDTO) => {
+  const { error } = messageValidation.validateCreateMessage(data)
+  if (error) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, cleanedMessage(error.message))
+  }
+  const { conversationId } = data
+  const uId = convertToObjectId(userId)
+  const conversation = await Conversation.findById(conversationId)
+  if (!conversation) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.CONVERSATION_NOT_FOUND)
+  }
+  if (conversation.type === CONVERSATION_TYPE.CHANNEL) {
+    const channel = await channelRepo.checkUserAlreadyInChannel(conversation.channelId!, uId)
+    if (!channel) {
+      throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_IN_CHANNEL)
+    }
+  } else {
+    const participantsSet = new Set(conversation.participants.map((id) => id.toString()))
+    if (!participantsSet.has(userId)) {
+      throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_IN_CONVERSATION)
+    }
+  }
+  const message = await Message.create({
+    ...data,
+    senderId: uId
+  })
+  return message
+}
+
+export { createMessageService }

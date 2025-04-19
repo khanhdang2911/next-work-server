@@ -22,6 +22,9 @@ const ERROR_MESSAGES = {
   CHANNEL_EXISTED: 'Channel already exists.',
   CHANNEL_NOT_FOUND: 'Channel not found in this workspace.',
   USER_ALREADY_IN_CHANNEL: 'User already in this channel',
-  USER_NOT_IN_CHANNEL: 'User not in this channel'
+  USER_NOT_IN_CHANNEL: 'User not in this channel',
+  CONVERSATION_NOT_FOUND: 'Conversation not found in this workspace.',
+  USER_NOT_IN_CONVERSATION: 'User not in this conversation.',
+  CONVERSATION_IS_EXISTED: 'Conversation already exists.'
 }
 export default ERROR_MESSAGES
