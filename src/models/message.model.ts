@@ -67,4 +67,4 @@ const MessageSchema = new Schema<IMessage>(
 )
 
 const Message = mongoose.model<IMessage>(DOCUMENT_NAME, MessageSchema)
-export { Message, IMessage }
+export { Message, IMessage, IAttachment }

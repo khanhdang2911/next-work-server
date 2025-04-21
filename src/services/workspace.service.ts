@@ -42,7 +42,7 @@ const getAllWorkspaceService = async (userId: string) => {
   const workspaces = await Workspace.find({
     'members.user': convertToObjectId(userId)
   })
-    .select('!members admin name')
+    .select('!members admin name description createdAt')
     .lean()
   return workspaces
 }
