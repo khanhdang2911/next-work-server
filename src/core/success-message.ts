@@ -25,6 +25,7 @@ const SUCCESS_MESSAGES = {
   // message
   SEND_MESSAGE_SUCCESS: 'Send message successfully.',
   //conversation
-  CREATE_CONVERSATION_SUCCESS: 'Create conversation successfully.'
+  CREATE_CONVERSATION_SUCCESS: 'Create conversation successfully.',
+  GET_MESSAGES_SUCCESS: 'Get messages successfully.'
 }
 export default SUCCESS_MESSAGES

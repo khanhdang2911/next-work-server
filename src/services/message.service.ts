@@ -37,4 +37,33 @@ const createMessageService = async (userId: string, data: MessageDTO) => {
   return message
 }
 
-export { createMessageService }
+const getMessagesService = async (userId: string, conversationId: string, page: number = 1, limit: number = 30) => {
+  const uId = convertToObjectId(userId)
+  const cId = convertToObjectId(conversationId)
+  const conversation = await Conversation.findById(cId)
+  if (!conversation) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.CONVERSATION_NOT_FOUND)
+  }
+  if (conversation.type === CONVERSATION_TYPE.CHANNEL) {
+    const channel = await channelRepo.checkUserAlreadyInChannel(conversation.channelId!, uId)
+    if (!channel) {
+      throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_IN_CHANNEL)
+    }
+  } else {
+    const participantsSet = new Set(conversation.participants.map((id) => id.toString()))
+    if (!participantsSet.has(userId)) {
+      throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_IN_CONVERSATION)
+    }
+  }
+  const messages = await Message.find({
+    conversationId: cId
+  })
+    .populate('senderId', 'name avatar')
+    .sort({ createdAt: -1 })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .lean()
+  return messages
+}
+
+export { createMessageService, getMessagesService }

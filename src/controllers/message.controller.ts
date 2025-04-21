@@ -21,4 +21,14 @@ const createMessage = async (req: Request, res: Response) => {
   new SuccessResponse(StatusCodes.CREATED, SUCCESS_MESSAGES.SEND_MESSAGE_SUCCESS, message).send(res)
 }
 
-export { createMessage }
+const getMessages = async (req: Request, res: Response) => {
+  const userId = req.userId
+  const { conversationId } = req.params
+  const { page, limit } = req.query
+  const parsedPage = page ? Number(page) : undefined
+  const parsedLimit = limit ? Number(limit) : undefined
+  const messages = await messageService.getMessagesService(userId, conversationId, parsedPage, parsedLimit)
+  new SuccessResponse(StatusCodes.OK, SUCCESS_MESSAGES.GET_MESSAGES_SUCCESS, messages).send(res)
+}
+
+export { createMessage, getMessages }
