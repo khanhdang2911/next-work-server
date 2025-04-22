@@ -5,13 +5,13 @@ const checkUserAlreadyInChannel = async (channelId: Types.ObjectId, userId: Type
   const checkUserExisted = await Channel.exists({
     _id: channelId,
     'members.user': userId
-  })
+  }).lean()
   return checkUserExisted
 }
 
 const checkChannelIsExisted = async (channelId: Types.ObjectId) => {
   return await Channel.exists({
     _id: channelId
-  })
+  }).lean()
 }
 export { checkUserAlreadyInChannel, checkChannelIsExisted }

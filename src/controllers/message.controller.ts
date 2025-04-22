@@ -1,6 +1,5 @@
 import { Request, Response } from 'express'
-import { StatusCodes } from 'http-status-codes'
-import SUCCESS_MESSAGES from '~/core/success-message'
+import { ReasonPhrases, StatusCodes } from 'http-status-codes'
 import SuccessResponse from '~/core/success.response'
 import { IAttachment } from '~/models/message.model'
 import * as messageService from '~/services/message.service'
@@ -18,7 +17,7 @@ const createMessage = async (req: Request, res: Response) => {
     attachments: fileInfos
   }
   const message = await messageService.createMessageService(userId, data)
-  new SuccessResponse(StatusCodes.CREATED, SUCCESS_MESSAGES.SEND_MESSAGE_SUCCESS, message).send(res)
+  new SuccessResponse(StatusCodes.CREATED, ReasonPhrases.OK, message).send(res)
 }
 
 const getMessages = async (req: Request, res: Response) => {
@@ -28,7 +27,7 @@ const getMessages = async (req: Request, res: Response) => {
   const parsedPage = page ? Number(page) : undefined
   const parsedLimit = limit ? Number(limit) : undefined
   const messages = await messageService.getMessagesService(userId, conversationId, parsedPage, parsedLimit)
-  new SuccessResponse(StatusCodes.OK, SUCCESS_MESSAGES.GET_MESSAGES_SUCCESS, messages).send(res)
+  new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, messages).send(res)
 }
 
 export { createMessage, getMessages }

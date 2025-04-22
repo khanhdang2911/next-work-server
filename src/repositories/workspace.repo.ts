@@ -8,7 +8,7 @@ const checkChannelsInWorkspace = async (workspaceId: Types.ObjectId, channels: T
       return await Channel.exists({
         _id: channelId,
         workspaceId
-      })
+      }).lean()
     })
   )
   const checkResult = checkChannelExisted.every((result) => result !== null)
@@ -23,7 +23,7 @@ const checkUserAlreadyInWorkspace = async (workspaceId: Types.ObjectId, userId: 
         user: userId
       }
     }
-  })
+  }).lean()
   return checkUserExisted
 }
 
@@ -31,7 +31,7 @@ const checkChannelInWorkspace = async (workspaceId: Types.ObjectId, channel: Typ
   const checkChannelExisted = await Channel.exists({
     _id: channel,
     workspaceId
-  })
+  }).lean()
   return checkChannelExisted
 }
 

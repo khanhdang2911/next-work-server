@@ -90,4 +90,53 @@ const inviteUserToChannelService = async (
     }
   )
 }
-export { createChannelService, inviteUserToChannelService }
+
+const getChannelsService = async (userId: string, workspaceId: string) => {
+  const wsId = convertToObjectId(workspaceId)
+  const uId = convertToObjectId(userId)
+  const checkUserInWorkspace = await workspaceRepo.checkUserAlreadyInWorkspace(wsId, uId)
+  if (!checkUserInWorkspace) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_IN_WORKSPACE)
+  }
+  const selectFields = ['_id', 'name', 'description', 'workspaceId']
+  const channels = await Channel.find({ workspaceId: wsId }).select(selectFields)
+  return channels
+}
+
+const getChannelMembersService = async (userId: string, channelId: string) => {
+  const cId = convertToObjectId(channelId)
+  const uId = convertToObjectId(userId)
+  const checkUserInChannel = await channelRepo.checkUserAlreadyInChannel(cId, uId)
+  if (!checkUserInChannel) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_IN_CHANNEL)
+  }
+  const checkChannel = await channelRepo.checkChannelIsExisted(cId)
+  if (!checkChannel) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.CHANNEL_NOT_FOUND)
+  }
+  const members = await Channel.aggregate([
+    { $match: { _id: cId } },
+    { $unwind: '$members' },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'members.user',
+        foreignField: '_id',
+        as: 'userInfo'
+      }
+    },
+    { $unwind: '$userInfo' },
+    {
+      $project: {
+        _id: '$userInfo._id',
+        name: '$userInfo.name',
+        email: '$userInfo.email',
+        avatar: '$userInfo.avatar',
+        joinedAt: '$members.joinedAt'
+      }
+    }
+  ])
+
+  return members
+}
+export { createChannelService, inviteUserToChannelService, getChannelsService, getChannelMembersService }

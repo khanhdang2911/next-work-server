@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
-import { StatusCodes } from 'http-status-codes'
+import { ReasonPhrases, StatusCodes } from 'http-status-codes'
 import SuccessResponse from '~/core/success.response'
-import SUCCESS_MESSAGES from '~/core/success-message'
 import * as channelService from '~/services/channel.service'
 
 const createChannel = async (req: Request, res: Response) => {
@@ -9,7 +8,7 @@ const createChannel = async (req: Request, res: Response) => {
   const userId = req.userId
   const data = req.body
   const channel = await channelService.createChannelService(userId, workspaceId, data)
-  new SuccessResponse(StatusCodes.CREATED, SUCCESS_MESSAGES.CREATE_CHANNEL_SUCCESS, channel).send(res)
+  new SuccessResponse(StatusCodes.CREATED, ReasonPhrases.OK, channel).send(res)
 }
 
 const inviteUserToChannel = async (req: Request, res: Response) => {
@@ -17,6 +16,20 @@ const inviteUserToChannel = async (req: Request, res: Response) => {
   const userId = req.userId
   const data = req.body
   await channelService.inviteUserToChannelService(userId, workspaceId, channelId, data)
-  new SuccessResponse(StatusCodes.OK, SUCCESS_MESSAGES.INVITE_USER_TO_CHANNEL_SUCCESS).send(res)
+  new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK).send(res)
 }
-export { createChannel, inviteUserToChannel }
+
+const getChannels = async (req: Request, res: Response) => {
+  const userId = req.userId
+  const { workspaceId } = req.params
+  const channels = await channelService.getChannelsService(userId, workspaceId)
+  new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, channels).send(res)
+}
+
+const getChannelMembers = async (req: Request, res: Response) => {
+  const userId = req.userId
+  const { channelId } = req.params
+  const members = await channelService.getChannelMembersService(userId, channelId)
+  new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, members).send(res)
+}
+export { createChannel, inviteUserToChannel, getChannels, getChannelMembers }
