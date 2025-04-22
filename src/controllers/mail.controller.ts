@@ -1,9 +1,8 @@
 import { Request, Response } from 'express'
-import { StatusCodes } from 'http-status-codes'
+import { ReasonPhrases, StatusCodes } from 'http-status-codes'
 import { MAX_AGE } from '~/constants/common.constant'
 import SuccessResponse from '~/core/success.response'
 import * as mailService from '~/services/mail.service'
-import SUCCESS_MESSAGES from '~/core/success-message'
 const verifyAccount = async (req: Request, res: Response) => {
   const { token, email } = req.body
   const response = await mailService.verifyAccount(token, email)
@@ -13,7 +12,7 @@ const verifyAccount = async (req: Request, res: Response) => {
     path: '/',
     maxAge: MAX_AGE
   })
-  new SuccessResponse(StatusCodes.OK, SUCCESS_MESSAGES.VERIFY_EMAIL_SUCCESS, response).send(res)
+  new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, response).send(res)
 }
 
 export { verifyAccount }
