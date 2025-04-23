@@ -8,5 +8,9 @@ const createConversation = async (req: Request, res: Response) => {
   const conversation = await conversationService.createConversation(userId, data)
   new SuccessResponse(StatusCodes.CREATED, ReasonPhrases.OK, conversation).send(res)
 }
-
-export { createConversation }
+const getDMConversations = async (req: Request, res: Response) => {
+  const userId = req.userId
+  const dmConversations = await conversationService.getDMConversations(userId)
+  new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, dmConversations).send(res)
+}
+export { createConversation, getDMConversations }
