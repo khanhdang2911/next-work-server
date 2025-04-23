@@ -64,5 +64,44 @@ const createConversation = async (userId: string, data: ConversationDTO) => {
 
   return conversation
 }
+const getDMConversations = async (userId: string) => {
+  const uId = convertToObjectId(userId)
+  const dmConversations = await Conversation.aggregate([
+    {
+      $match: {
+        type: CONVERSATION_TYPE.DIRECT,
+        participants: {
+          $in: [uId]
+        }
+      }
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'participants',
+        foreignField: '_id',
+        as: 'participants'
+      }
+    },
+    {
+      $unwind: '$participants'
+    },
+    {
+      $match: {
+        'participants._id': { $ne: uId }
+      }
+    },
+    {
+      $project: {
+        _id: 1,
+        name: '$participants.name',
+        // avatar: '$participants.avatar',
+        avatar: 'https://i.pinimg.com/736x/a6/35/71/a6357165a4f5af06a5c39e1b56705421.jpg',
+        conversationId: '$_id'
+      }
+    }
+  ])
 
-export { createConversation }
+  return dmConversations
+}
+export { createConversation, getDMConversations }

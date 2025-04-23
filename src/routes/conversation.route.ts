@@ -8,4 +8,5 @@ conversationRouter.use(asyncErrorHandler(authMiddleware))
 
 // create conversation
 conversationRouter.post('/', asyncErrorHandler(conversationController.createConversation))
+conversationRouter.get('/dm', asyncErrorHandler(conversationController.getDMConversations))
 export default conversationRouter

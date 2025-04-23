@@ -7,6 +7,9 @@ import * as channelValidation from '~/validations/channel.validation'
 import * as workspaceRepo from '~/repositories/workspace.repo'
 import { User } from '~/models/user.model'
 import * as channelRepo from '~/repositories/channel.repo'
+import * as conversationService from '~/services/conversation.service'
+import { ConversationDTO } from '~/dtos/conversation.dto'
+import { CONVERSATION_TYPE } from '~/constants/common.constant'
 const createChannelService = async (userId: string, workspaceId: string, data: IChannel) => {
   const { error } = channelValidation.validateCreateChannel(data)
   if (error) {
@@ -35,6 +38,11 @@ const createChannelService = async (userId: string, workspaceId: string, data: I
     members: [firstMember],
     admin: [uId]
   })
+  const conversation: ConversationDTO = {
+    type: CONVERSATION_TYPE.CHANNEL,
+    channelId: channel._id.toString()
+  }
+  await conversationService.createConversation(userId, conversation)
   return channel
 }
 
@@ -98,8 +106,29 @@ const getChannelsService = async (userId: string, workspaceId: string) => {
   if (!checkUserInWorkspace) {
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_IN_WORKSPACE)
   }
-  const selectFields = ['_id', 'name', 'description', 'workspaceId']
-  const channels = await Channel.find({ workspaceId: wsId }).select(selectFields)
+  const channels = await Channel.aggregate([
+    { $match: { workspaceId: wsId } },
+    {
+      $lookup: {
+        from: 'conversations',
+        localField: '_id',
+        foreignField: 'channelId',
+        as: 'conversation'
+      }
+    },
+    {
+      $unwind: '$conversation'
+    },
+    {
+      $project: {
+        _id: 1,
+        name: 1,
+        workspaceId: 1,
+        conversationId: '$conversation._id',
+        isPrivate: 1
+      }
+    }
+  ])
   return channels
 }
 
