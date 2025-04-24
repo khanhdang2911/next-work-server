@@ -152,4 +152,24 @@ const acceptInvitationService = async (token: string, workspaceId: string) => {
   )
   await Invitation.deleteOne({ token })
 }
-export { createWorkspaceService, getAllWorkspaceService, inviteUserToWorkspaceService, acceptInvitationService }
+
+const getWorkspaceByIdService = async (workspaceId: string, userId: string) => {
+  const wsId = convertToObjectId(workspaceId)
+  const uId = convertToObjectId(userId)
+  const checkUserInWorkspace = await workspaceRepo.checkUserAlreadyInWorkspace(wsId, uId)
+  if (!checkUserInWorkspace) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_IN_WORKSPACE)
+  }
+  const workspace = await Workspace.findById(wsId).select('name description image').lean()
+  if (!workspace) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.WORKSPACE_NOT_FOUND)
+  }
+  return workspace
+}
+export {
+  createWorkspaceService,
+  getAllWorkspaceService,
+  inviteUserToWorkspaceService,
+  acceptInvitationService,
+  getWorkspaceByIdService
+}
