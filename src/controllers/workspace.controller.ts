@@ -21,10 +21,18 @@ const inviteUserToWorkspace = async (req: Request, res: Response) => {
   await workspaceService.inviteUserToWorkspaceService(workspaceId, userId, data)
   new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK).send(res)
 }
+
 const acceptInvitation = async (req: Request, res: Response) => {
   const token = req.params.token
   const { workspaceId } = req.params
   await workspaceService.acceptInvitationService(token, workspaceId)
   new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK).send(res)
 }
-export { createWorkspace, getAllWorkspace, inviteUserToWorkspace, acceptInvitation }
+
+const getWorkspaceById = async (req: Request, res: Response) => {
+  const userId = req.userId
+  const { workspaceId } = req.params
+  const workspace = await workspaceService.getWorkspaceByIdService(workspaceId, userId)
+  new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, workspace).send(res)
+}
+export { createWorkspace, getAllWorkspace, inviteUserToWorkspace, acceptInvitation, getWorkspaceById }
