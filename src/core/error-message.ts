@@ -29,6 +29,7 @@ const ERROR_MESSAGES = {
   // upload file
   FILE_TOO_BIG: 'File too big, limited to 40MB!',
   TOO_MANY_FILES: 'Too many files, limited to 5 files!',
-  ERROR_UPLOADING_FILES: 'Error uploading files!'
+  ERROR_UPLOADING_FILES: 'Error uploading file, please try again.',
+  INVALID_FILE_TYPE: 'Invalid file type, only image files are allowed!'
 }
 export default ERROR_MESSAGES
