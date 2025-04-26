@@ -4,16 +4,6 @@ const validateCreateMessage = (data: object) => {
   const schema = Joi.object({
     content: Joi.string(),
     conversationId: Joi.string().required(),
-    attachments: Joi.array()
-      .items(
-        Joi.object({
-          name: Joi.string().required(),
-          type: Joi.string().required(),
-          size: Joi.number().required(),
-          url: Joi.string().uri().required()
-        })
-      )
-      .optional(),
     reactions: Joi.array()
       .items(
         Joi.object({
