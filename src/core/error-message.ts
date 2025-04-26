@@ -25,6 +25,10 @@ const ERROR_MESSAGES = {
   USER_NOT_IN_CHANNEL: 'User not in this channel',
   CONVERSATION_NOT_FOUND: 'Conversation not found.',
   USER_NOT_IN_CONVERSATION: 'User not in this conversation.',
-  CONVERSATION_IS_EXISTED: 'Conversation already exists.'
+  CONVERSATION_IS_EXISTED: 'Conversation already exists.',
+  // upload file
+  FILE_TOO_BIG: 'File too big, limited to 40MB!',
+  TOO_MANY_FILES: 'Too many files, limited to 5 files!',
+  ERROR_UPLOADING_FILES: 'Error uploading files!'
 }
 export default ERROR_MESSAGES

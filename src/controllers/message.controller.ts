@@ -1,22 +1,12 @@
 import { Request, Response } from 'express'
 import { ReasonPhrases, StatusCodes } from 'http-status-codes'
 import SuccessResponse from '~/core/success.response'
-import { IAttachment } from '~/models/message.model'
 import * as messageService from '~/services/message.service'
 const createMessage = async (req: Request, res: Response) => {
   const userId = req.userId
+  const data = req.body
   const files = req.files as Express.Multer.File[]
-  const fileInfos: IAttachment[] = files?.map((file) => ({
-    name: file.originalname,
-    type: file.mimetype,
-    size: file.size,
-    url: file.path
-  }))
-  const data = {
-    ...req.body,
-    attachments: fileInfos
-  }
-  const message = await messageService.createMessageService(userId, data)
+  const message = await messageService.createMessageService(userId, data, files)
   new SuccessResponse(StatusCodes.CREATED, ReasonPhrases.OK, message).send(res)
 }
 
