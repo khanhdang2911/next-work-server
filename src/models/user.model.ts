@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose'
-import { GENDER, ROLES } from '~/constants/common.constant'
+import { GENDER, ROLES, USER_STATUS } from '~/constants/common.constant'
 
 const COLLECTION_NAME = 'users'
 const DOCUMENT_NAME = 'user'
@@ -11,7 +11,7 @@ interface IUser {
   refreshToken: string
   gender: string
   avatar: string
-  isOnline: boolean
+  status: string
   role: string
   auth0Id: string
   isActivated: boolean
@@ -58,6 +58,10 @@ const UserSchema = new Schema<IUser>(
       type: Boolean,
       required: true,
       default: false
+    },
+    status: {
+      type: String,
+      enum: USER_STATUS
     }
   },
   {

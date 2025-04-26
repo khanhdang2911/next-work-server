@@ -1,7 +1,12 @@
 import { Request, Response } from 'express'
 import { ReasonPhrases, StatusCodes } from 'http-status-codes'
 import SuccessResponse from '~/core/success.response'
-import { getALlUsersService, getUserByIdService, searchUserService } from '~/services/user.service'
+import {
+  getALlUsersService,
+  getUserByIdService,
+  searchUserService,
+  updateUserByIdService
+} from '~/services/user.service'
 const getAllUsers = async (req: Request, res: Response) => {
   const users = await getALlUsersService()
   new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, users).send(res)
@@ -18,4 +23,13 @@ const getUserById = async (req: Request, res: Response) => {
   const user = await getUserByIdService(id)
   new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, user).send(res)
 }
-export { getAllUsers, searchUser, getUserById }
+
+const updateUserById = async (req: Request, res: Response) => {
+  const userId = req.userId
+  const data = req.body
+  const file = req.file ?? null
+  const user = await updateUserByIdService(userId, data, file)
+  new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, user).send(res)
+}
+
+export { getAllUsers, searchUser, getUserById, updateUserById }

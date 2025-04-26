@@ -8,8 +8,7 @@ import { Conversation } from '~/models/conversation.model'
 import { CONVERSATION_TYPE } from '~/constants/common.constant'
 import * as channelRepo from '~/repositories/channel.repo'
 import { MessageDTO } from '~/dtos/message.dto'
-import { BlobSASPermissions } from '@azure/storage-blob'
-import { containerClient } from '~/configs/azure.init'
+import { uploadFileToAzure } from '~/configs/azure.init'
 const createMessageService = async (userId: string, data: MessageDTO, files: Express.Multer.File[]) => {
   const { error } = messageValidation.validateCreateMessage(data)
   if (error) {
@@ -36,24 +35,7 @@ const createMessageService = async (userId: string, data: MessageDTO, files: Exp
   const fileInfos: IAttachment[] = []
 
   for (const file of files) {
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-    const blobName = `${timestamp}_${file.originalname}`
-
-    const blockBlobClient = containerClient.getBlockBlobClient(blobName)
-
-    await blockBlobClient.uploadData(file.buffer, {
-      blobHTTPHeaders: {
-        blobContentType: file.mimetype
-      }
-    })
-
-    const expiresOn = new Date()
-    expiresOn.setFullYear(expiresOn.getFullYear() + 1)
-
-    const sasToken = await blockBlobClient.generateSasUrl({
-      permissions: BlobSASPermissions.parse('r'),
-      expiresOn: expiresOn
-    })
+    const sasToken = await uploadFileToAzure(file)
 
     fileInfos.push({
       name: file.originalname,
