@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { getAllUsers, searchUser } from '~/controllers/user.controller'
+import { getAllUsers, getUserById, searchUser } from '~/controllers/user.controller'
 import asyncErrorHandler from '~/helpers/async-error-handler'
 import authMiddleware from '~/middlewares/auth.middleware'
 import checkPermission from '~/middlewares/permission.middleware'
@@ -9,4 +9,5 @@ userRouter.use(asyncErrorHandler(authMiddleware))
 //Authenticating the user before accessing the route
 userRouter.get('/', checkPermission('readAny', 'user'), asyncErrorHandler(getAllUsers))
 userRouter.get('/search/:keyword', checkPermission('readOwn', 'user'), asyncErrorHandler(searchUser))
+userRouter.get('/:id', asyncErrorHandler(getUserById))
 export default userRouter

@@ -93,7 +93,7 @@ const getDMConversations = async (userId: string) => {
     },
     {
       $project: {
-        _id: 1,
+        _id: 0,
         name: '$participants.name',
         // avatar: '$participants.avatar',
         avatar: 'https://i.pinimg.com/736x/a6/35/71/a6357165a4f5af06a5c39e1b56705421.jpg',
