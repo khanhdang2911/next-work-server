@@ -13,7 +13,7 @@ const ERROR_MESSAGES = {
   // workspace
   WORKSPACE_NOT_FOUND: 'Workspace not found.',
   WORKSPACE_EXISTED: 'Workspace already exists.',
-  USER_NOT_IN_WORKSPACE: 'You are not in this workspace, please join the workspace first.',
+  USER_NOT_IN_WORKSPACE: 'User are not in this workspace, please join the workspace first.',
   NOT_ADMIN_WORKSPACE: 'You are not admin of this workspace, you can not invite user to this workspace.',
   ALREADY_SEND_INVITATION: 'Invitation already sent to this email.',
   INVITATION_NOT_FOUND: 'Invitation not found or expired.',

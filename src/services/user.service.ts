@@ -49,7 +49,7 @@ const updateUserByIdService = async (userId: string, data: UserUpdateDTO, file: 
     fields: 'name email avatar status gender'
   })
   // delete file from azure
-  if (user.avatar) deleteFileFromAzure(extractBlobName(user.avatar))
+  if (file) deleteFileFromAzure(extractBlobName(user.avatar))
   return userUpdated
 }
 export { getALlUsersService, searchUserService, getUserByIdService, updateUserByIdService }
