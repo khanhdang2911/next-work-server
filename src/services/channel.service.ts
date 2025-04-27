@@ -107,7 +107,12 @@ const getChannelsService = async (userId: string, workspaceId: string) => {
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_IN_WORKSPACE)
   }
   const channels = await Channel.aggregate([
-    { $match: { workspaceId: wsId } },
+    {
+      $match: {
+        workspaceId: wsId,
+        'members.user': uId
+      }
+    },
     {
       $lookup: {
         from: 'conversations',
@@ -161,7 +166,16 @@ const getChannelMembersService = async (userId: string, channelId: string) => {
         name: '$userInfo.name',
         email: '$userInfo.email',
         avatar: '$userInfo.avatar',
-        joinedAt: '$members.joinedAt'
+        gender: '$userInfo.gender',
+        status: '$userInfo.status',
+        joinedAt: '$members.joinedAt',
+        admin: {
+          $cond: {
+            if: { $in: ['$userInfo._id', '$admin'] },
+            then: true,
+            else: false
+          }
+        }
       }
     }
   ])

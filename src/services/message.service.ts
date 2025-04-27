@@ -53,7 +53,7 @@ const createMessageService = async (userId: string, data: MessageDTO, files: Exp
   return message
 }
 
-const getMessagesService = async (userId: string, conversationId: string, page: number = 1, limit: number = 30) => {
+const getMessagesService = async (userId: string, conversationId: string, page: number = 1, limit: number = 100) => {
   const uId = convertToObjectId(userId)
   const cId = convertToObjectId(conversationId)
   const conversation = await Conversation.findById(cId)
@@ -78,6 +78,7 @@ const getMessagesService = async (userId: string, conversationId: string, page: 
     .sort({ createdAt: -1 })
     .skip((page - 1) * limit)
     .limit(limit)
+    .sort({ createdAt: 1 })
     .lean()
   return messages
 }
