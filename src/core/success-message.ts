@@ -14,6 +14,7 @@ const SUCCESS_MESSAGES = {
   // user
   GET_ALL_USER_SUCCESS: 'Get all user successfully.',
   SEARCH_USER_SUCCESS: 'Search user successfully.',
+  UPDATE_USER_SUCCESS: 'Update user successfully.',
   // workspace
   CREATE_WORKSPACE_SUCCESS: 'Create workspace successfully.',
   GET_ALL_WORKSPACE_SUCCESS: 'Get all workspace successfully.',
@@ -27,6 +28,8 @@ const SUCCESS_MESSAGES = {
   SEND_MESSAGE_SUCCESS: 'Send message successfully.',
   //conversation
   CREATE_CONVERSATION_SUCCESS: 'Create conversation successfully.',
-  GET_MESSAGES_SUCCESS: 'Get messages successfully.'
+  GET_MESSAGES_SUCCESS: 'Get messages successfully.',
+  DELETE_MESSAGE_SUCCESS: 'Delete message successfully.',
+  UPDATE_MESSAGE_SUCCESS: 'Update message successfully.'
 }
 export default SUCCESS_MESSAGES

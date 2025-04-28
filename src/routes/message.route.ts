@@ -7,4 +7,6 @@ const messageRouter = Router()
 messageRouter.use(asyncErrorHandler(authMiddleware))
 messageRouter.post('/', handleUploadManyFile, asyncErrorHandler(messageController.createMessage))
 messageRouter.get('/:conversationId', asyncErrorHandler(messageController.getMessages))
+messageRouter.delete('/:id', asyncErrorHandler(messageController.deleteMessage))
+messageRouter.patch('/:id', asyncErrorHandler(messageController.updateMessage))
 export default messageRouter

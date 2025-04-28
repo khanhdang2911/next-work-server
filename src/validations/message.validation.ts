@@ -17,4 +17,11 @@ const validateCreateMessage = (data: object) => {
   return schema.validate(data)
 }
 
-export { validateCreateMessage }
+const validateUpdateMessage = (data: object) => {
+  const schema = Joi.object({
+    content: Joi.string()
+  })
+  return schema.validate(data)
+}
+
+export { validateCreateMessage, validateUpdateMessage }
