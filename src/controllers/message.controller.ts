@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { ReasonPhrases, StatusCodes } from 'http-status-codes'
+import SUCCESS_MESSAGES from '~/core/success-message'
 import SuccessResponse from '~/core/success.response'
 import * as messageService from '~/services/message.service'
 const createMessage = async (req: Request, res: Response) => {
@@ -20,4 +21,17 @@ const getMessages = async (req: Request, res: Response) => {
   new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, messages).send(res)
 }
 
-export { createMessage, getMessages }
+const deleteMessage = async (req: Request, res: Response) => {
+  const userId = req.userId
+  const { id } = req.params
+  const message = await messageService.deleteMessageService(userId, id)
+  new SuccessResponse(StatusCodes.OK, SUCCESS_MESSAGES.DELETE_MESSAGE_SUCCESS, message).send(res)
+}
+const updateMessage = async (req: Request, res: Response) => {
+  const userId = req.userId
+  const { id } = req.params
+  const data = req.body
+  const message = await messageService.updateMessageService(userId, id, data)
+  new SuccessResponse(StatusCodes.OK, SUCCESS_MESSAGES.UPDATE_MESSAGE_SUCCESS, message).send(res)
+}
+export { createMessage, getMessages, deleteMessage, updateMessage }

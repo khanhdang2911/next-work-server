@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { ReasonPhrases, StatusCodes } from 'http-status-codes'
+import SUCCESS_MESSAGES from '~/core/success-message'
 import SuccessResponse from '~/core/success.response'
 import * as channelService from '~/services/channel.service'
 
@@ -8,7 +9,7 @@ const createChannel = async (req: Request, res: Response) => {
   const userId = req.userId
   const data = req.body
   const channel = await channelService.createChannelService(userId, workspaceId, data)
-  new SuccessResponse(StatusCodes.CREATED, ReasonPhrases.OK, channel).send(res)
+  new SuccessResponse(StatusCodes.CREATED, SUCCESS_MESSAGES.CREATE_CHANNEL_SUCCESS, channel).send(res)
 }
 
 const inviteUserToChannel = async (req: Request, res: Response) => {
@@ -16,7 +17,7 @@ const inviteUserToChannel = async (req: Request, res: Response) => {
   const userId = req.userId
   const data = req.body
   await channelService.inviteUserToChannelService(userId, workspaceId, channelId, data)
-  new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK).send(res)
+  new SuccessResponse(StatusCodes.OK, SUCCESS_MESSAGES.INVITE_USER_TO_CHANNEL_SUCCESS).send(res)
 }
 
 const getChannels = async (req: Request, res: Response) => {

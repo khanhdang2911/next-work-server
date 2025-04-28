@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { ReasonPhrases, StatusCodes } from 'http-status-codes'
+import SUCCESS_MESSAGES from '~/core/success-message'
 import SuccessResponse from '~/core/success.response'
 import {
   getALlUsersService,
@@ -29,7 +30,7 @@ const updateUserById = async (req: Request, res: Response) => {
   const data = req.body
   const file = req.file ?? null
   const user = await updateUserByIdService(userId, data, file)
-  new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, user).send(res)
+  new SuccessResponse(StatusCodes.OK, SUCCESS_MESSAGES.UPDATE_USER_SUCCESS, user).send(res)
 }
 
 export { getAllUsers, searchUser, getUserById, updateUserById }
