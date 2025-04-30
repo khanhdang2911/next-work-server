@@ -26,6 +26,7 @@ const ERROR_MESSAGES = {
   CONVERSATION_NOT_FOUND: 'Conversation not found.',
   USER_NOT_IN_CONVERSATION: 'User not in this conversation.',
   CONVERSATION_IS_EXISTED: 'Conversation already exists.',
+  CAN_NOT_DELETE_YOURSELF: 'You can not delete yourself from this channel.',
   // upload file
   FILE_TOO_BIG: 'File too big, limited to 40MB!',
   TOO_MANY_FILES: 'Too many files, limited to 5 files!',

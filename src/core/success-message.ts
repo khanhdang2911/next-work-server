@@ -24,6 +24,7 @@ const SUCCESS_MESSAGES = {
   CREATE_CHANNEL_SUCCESS: 'Create channel successfully.',
   INVITE_USER_TO_CHANNEL_SUCCESS: 'Invite user to channel successfully.',
   GET_CHANNELS_SUCCESS: 'Get channels successfully.',
+  DELETE_MEMBER_FROM_CHANNEL_SUCCESS: 'Delete member from channel successfully.',
   // message
   SEND_MESSAGE_SUCCESS: 'Send message successfully.',
   //conversation
