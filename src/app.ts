@@ -10,10 +10,19 @@ const app = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
+
+const allowedOrigins = process.env.FE_URL?.split(',').map((origin) => origin.trim()) || []
+
 app.use(
   cors({
-    origin: process.env.FE_URL, // Frontend URL
-    credentials: true // Allow cookies
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true)
+      } else {
+        callback(null, false)
+      }
+    },
+    credentials: true
   })
 )
 startDatabase()
