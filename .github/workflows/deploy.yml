@@ -1,0 +1,42 @@
+name: next-work-server - Deploy production with docker
+on:
+  push:
+    branches: ['main']
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    outputs:
+      commit_sha: ${{ steps.get_commit_sha.outputs.commit_sha }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Create .env file
+        run: echo "${{ secrets.ENV_PRODUCTION }}" | base64 -d > .env
+      - name: Build docker image
+        run: docker build -t next-work-server .
+      - name: Get commit SHA
+        id: get_commit_sha
+        run: echo "commit_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      - name: Login to docker hub
+        run: docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}"
+      - name: Push docker image
+        run: |
+          docker tag next-work-server "${{ secrets.DOCKER_USERNAME }}/next-work-server:${{ steps.get_commit_sha.outputs.commit_sha }}"
+          docker push "${{ secrets.DOCKER_USERNAME }}/next-work-server:${{ steps.get_commit_sha.outputs.commit_sha }}"
+  deploy:
+    runs-on: ubuntu-22.04
+    needs: build
+    steps:
+      - name: SSH to production
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          password: ${{ secrets.PRODUCTION_PASSWORD }}
+          script: |
+            sudo docker pull "${{ secrets.DOCKER_USERNAME }}/next-work-server:${{ needs.build.outputs.commit_sha }}"
+            sudo docker stop next-work-server || true
+            sudo docker rm next-work-server || true
+            sudo docker images | grep "${{ secrets.DOCKER_USERNAME }}/next-work-server" | grep -v "${{ needs.build.outputs.commit_sha }}" | awk '{print $3}' | xargs -r sudo docker rmi || true
+            sudo docker image prune -f || true
+            sudo docker run -dp 9099:8099 --name next-work-server "${{ secrets.DOCKER_USERNAME }}/next-work-server:${{ needs.build.outputs.commit_sha }}"
