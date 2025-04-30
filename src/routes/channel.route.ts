@@ -11,4 +11,6 @@ channelRouter.post('/:workspaceId', asyncErrorHandler(channelController.createCh
 channelRouter.post('/:workspaceId/:channelId/invite', asyncErrorHandler(channelController.inviteUserToChannel))
 channelRouter.get('/:workspaceId', asyncErrorHandler(channelController.getChannels))
 channelRouter.get('/:channelId/members', asyncErrorHandler(channelController.getChannelMembers))
+// delete member from channel
+channelRouter.delete('/:channelId/members/:memberId', asyncErrorHandler(channelController.deleteMemberFromChannel))
 export default channelRouter

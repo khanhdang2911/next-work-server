@@ -33,4 +33,11 @@ const getChannelMembers = async (req: Request, res: Response) => {
   const members = await channelService.getChannelMembersService(userId, channelId)
   new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, members).send(res)
 }
-export { createChannel, inviteUserToChannel, getChannels, getChannelMembers }
+
+const deleteMemberFromChannel = async (req: Request, res: Response) => {
+  const { channelId, memberId } = req.params
+  const userId = req.userId
+  await channelService.deleteMemberFromChannelService(userId, channelId, memberId)
+  new SuccessResponse(StatusCodes.OK, SUCCESS_MESSAGES.DELETE_MEMBER_FROM_CHANNEL_SUCCESS).send(res)
+}
+export { createChannel, inviteUserToChannel, getChannels, getChannelMembers, deleteMemberFromChannel }

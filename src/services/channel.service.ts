@@ -1,4 +1,4 @@
-import { StatusCodes } from 'http-status-codes'
+import { ReasonPhrases, StatusCodes } from 'http-status-codes'
 import ErrorResponse from '~/core/error.response'
 import ERROR_MESSAGES from '~/core/error-message'
 import { Channel, IChannel, IChannelMember } from '~/models/channel.model'
@@ -59,8 +59,8 @@ const inviteUserToChannelService = async (
   const wsId = convertToObjectId(workspaceId)
   const cId = convertToObjectId(channelId)
   const uId = convertToObjectId(userId)
-  const checkUserInWorkspace = await workspaceRepo.checkUserAlreadyInWorkspace(wsId, uId)
-  if (!checkUserInWorkspace) {
+  const checkUserIsAdminOfChannel = await channelRepo.checkUserIsAdminOfChannel(cId, uId)
+  if (!checkUserIsAdminOfChannel) {
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_IN_WORKSPACE)
   }
   const checkUserInChannel = await channelRepo.checkUserAlreadyInChannel(cId, uId)
@@ -182,4 +182,34 @@ const getChannelMembersService = async (userId: string, channelId: string) => {
 
   return members
 }
-export { createChannelService, inviteUserToChannelService, getChannelsService, getChannelMembersService }
+
+const deleteMemberFromChannelService = async (userId: string, channelId: string, memberId: string) => {
+  const uId = convertToObjectId(userId)
+  const cId = convertToObjectId(channelId)
+  const mId = convertToObjectId(memberId)
+  if (userId === memberId) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.CAN_NOT_DELETE_YOURSELF)
+  }
+  const checkUserIsAdminOfChannel = await channelRepo.checkUserIsAdminOfChannel(cId, uId)
+  if (!checkUserIsAdminOfChannel) {
+    throw new ErrorResponse(StatusCodes.FORBIDDEN, ReasonPhrases.FORBIDDEN)
+  }
+  const checkUserInChannel = await channelRepo.checkUserAlreadyInChannel(cId, mId)
+  if (!checkUserInChannel) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_IN_CHANNEL)
+  }
+  await Channel.updateOne(
+    {
+      _id: cId,
+      'members.user': mId
+    },
+    { $pull: { members: { user: mId } } }
+  )
+}
+export {
+  createChannelService,
+  inviteUserToChannelService,
+  getChannelsService,
+  getChannelMembersService,
+  deleteMemberFromChannelService
+}
