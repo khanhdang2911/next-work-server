@@ -12,21 +12,20 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 
 const allowedOrigins = process.env.FE_URL?.split(',').map((origin) => origin.trim()) || []
-
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true)
-      } else {
-        callback(null, false)
-      }
-    },
-    credentials: true
-  })
-)
+const corsOptions = {
+  origin: function (origin: string | undefined, callback: (error: Error | null, allow?: boolean) => void) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(null, false)
+    }
+  },
+  credentials: true
+}
+app.use(cors(corsOptions))
 startDatabase()
 app.use('/api', router)
 app.use(handleNotFound)
 app.use(handleError)
 export default app
+export { corsOptions }
