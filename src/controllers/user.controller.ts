@@ -15,7 +15,8 @@ const getAllUsers = async (req: Request, res: Response) => {
 
 const searchUser = async (req: Request, res: Response) => {
   const userId = req.userId
-  const users = await searchUserService(req.params.keyword, userId)
+  const { keyword, channelId } = req.params
+  const users = await searchUserService(keyword, channelId, userId)
   new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, users).send(res)
 }
 

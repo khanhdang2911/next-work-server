@@ -6,18 +6,26 @@ import { UserUpdateDTO } from '~/dtos/user.dto'
 import { cleanedMessage, extractBlobName } from '~/utils/common'
 import * as userValidation from '~/validations/user.validation'
 import { deleteFileFromAzure, uploadFileToAzure } from '~/configs/azure.init'
+import { Channel } from '~/models/channel.model'
 const getALlUsersService = async () => {
   const users = await User.find()
   return users
 }
 
-const searchUserService = async (keyword: string, userId: string) => {
+const searchUserService = async (keyword: string, channelId: string, userId: string) => {
+  const usersInChannel = await Channel.findOne({
+    _id: channelId,
+    'members.user': userId
+  }).select('members.user')
+  if (!usersInChannel) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_IN_CHANNEL)
+  }
+  const usersId = usersInChannel?.members?.map((member) => member.user)
   const users = await User.find({
-    $text: {
-      $search: keyword
-    }
-  }).select('name email avatar gender status')
-  return users.filter((user) => user._id.toString() !== userId)
+    _id: { $in: usersId },
+    $text: { $search: keyword }
+  }).select('name avatar')
+  return users
 }
 
 const getUserByIdService = async (id: string) => {
