@@ -20,6 +20,12 @@ const socketHandler = (io: Server) => {
       socket.to(message.conversationId).emit('receive-message', message)
       // await notificationMessageService.....
     })
+    socket.on('edit-message', (message) => {
+      socket.to(message.conversationId).emit('receive-edit-message', message)
+    })
+    socket.on('delete-message', (message) => {
+      socket.to(message.conversationId).emit('receive-delete-message', message)
+    })
 
     socket.on('leave-conversation', (conversationId, userId) => {
       socket.leave(conversationId)

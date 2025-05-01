@@ -9,7 +9,7 @@ const userRouter = Router()
 userRouter.use(asyncErrorHandler(authMiddleware))
 //Authenticating the user before accessing the route
 userRouter.get('/', checkPermission('readAny', 'user'), asyncErrorHandler(getAllUsers))
-userRouter.get('/search/:keyword', checkPermission('readOwn', 'user'), asyncErrorHandler(searchUser))
+userRouter.get('/search/:keyword/:channelId', asyncErrorHandler(searchUser))
 userRouter.get('/:id', asyncErrorHandler(getUserById))
 // update user by id
 userRouter.patch('/', handleUploadSingleFile, asyncErrorHandler(updateUserById))
