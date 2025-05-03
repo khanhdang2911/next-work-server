@@ -10,7 +10,8 @@ const createConversation = async (req: Request, res: Response) => {
 }
 const getDMConversations = async (req: Request, res: Response) => {
   const userId = req.userId
-  const dmConversations = await conversationService.getDMConversations(userId)
+  const { workspaceId } = req.params
+  const dmConversations = await conversationService.getDMConversations(userId, workspaceId)
   new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, dmConversations).send(res)
 }
 export { createConversation, getDMConversations }
