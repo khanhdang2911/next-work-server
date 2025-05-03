@@ -6,6 +6,7 @@ const DOCUMENT_NAME = 'conversation'
 interface IConversation {
   type: string
   channelId?: Types.ObjectId
+  workspaceId?: Types.ObjectId
   participants: Types.ObjectId[]
 }
 
@@ -21,6 +22,13 @@ const ConversationSchema = new Schema<IConversation>(
       ref: 'channel',
       required: function (this: IConversation) {
         return this.type === CONVERSATION_TYPE.CHANNEL
+      }
+    },
+    workspaceId: {
+      type: Schema.Types.ObjectId,
+      ref: 'workspace',
+      required: function (this: IConversation) {
+        return this.type === CONVERSATION_TYPE.DIRECT
       }
     },
     participants: [

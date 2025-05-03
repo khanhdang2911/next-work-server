@@ -33,6 +33,8 @@ const ERROR_MESSAGES = {
   ERROR_UPLOADING_FILES: 'Error uploading file, please try again.',
   INVALID_FILE_TYPE: 'Invalid file type, only image files are allowed!',
   // message
-  MESSAGE_NOT_FOUND: 'Message not found.'
+  MESSAGE_NOT_FOUND: 'Message not found.',
+  // conversation
+  CANNOT_CREATE_CONVERSATION: 'You can not create this conversation.'
 }
 export default ERROR_MESSAGES

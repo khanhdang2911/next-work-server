@@ -18,13 +18,18 @@ const checkChannelsInWorkspace = async (workspaceId: Types.ObjectId, channels: T
 const checkUserAlreadyInWorkspace = async (workspaceId: Types.ObjectId, userId: Types.ObjectId) => {
   const checkUserExisted = await Workspace.exists({
     _id: workspaceId,
-    members: {
-      $elemMatch: {
-        user: userId
-      }
-    }
+    'members.user': userId
   }).lean()
   return checkUserExisted
+}
+
+const checkUsersAlreadyInWorkspace = async (workspaceId: Types.ObjectId, users: Types.ObjectId[]) => {
+  return await Workspace.exists({
+    _id: workspaceId,
+    'members.user': {
+      $all: users
+    }
+  }).lean()
 }
 
 const checkChannelInWorkspace = async (workspaceId: Types.ObjectId, channel: Types.ObjectId) => {
@@ -35,4 +40,4 @@ const checkChannelInWorkspace = async (workspaceId: Types.ObjectId, channel: Typ
   return checkChannelExisted
 }
 
-export { checkChannelsInWorkspace, checkUserAlreadyInWorkspace, checkChannelInWorkspace }
+export { checkChannelsInWorkspace, checkUserAlreadyInWorkspace, checkChannelInWorkspace, checkUsersAlreadyInWorkspace }

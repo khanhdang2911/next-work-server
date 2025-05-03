@@ -8,6 +8,7 @@ import { CONVERSATION_TYPE } from '~/constants/common.constant'
 import ERROR_MESSAGES from '~/core/error-message'
 import { User } from '~/models/user.model'
 import { ConversationDTO } from '~/dtos/conversation.dto'
+import * as workspaceRepo from '~/repositories/workspace.repo'
 
 const createConversation = async (userId: string, data: ConversationDTO) => {
   const { error } = conversationValidation.createConversationValidation(data)
@@ -15,8 +16,8 @@ const createConversation = async (userId: string, data: ConversationDTO) => {
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, cleanedMessage(error.message))
   }
 
-  const { type, channelId, participants } = data
-
+  const { type, channelId, workspaceId, participants } = data
+  const convertedWorkspaceId = convertToObjectId(workspaceId)
   const convertedChannelId = channelId ? convertToObjectId(channelId) : undefined
   const convertedParticipants = participants?.map((id) => convertToObjectId(id))
   // check conversation is existed
@@ -32,7 +33,7 @@ const createConversation = async (userId: string, data: ConversationDTO) => {
       type,
       participants: {
         $all: convertedParticipants,
-        $size: convertedParticipants?.length
+        $size: 2
       }
     })
   }
@@ -47,29 +48,38 @@ const createConversation = async (userId: string, data: ConversationDTO) => {
       throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.CHANNEL_NOT_FOUND)
     }
   } else {
-    const users = await User.find({
-      _id: { $in: convertedParticipants }
-    })
+    const users = await User.find({ _id: { $in: convertedParticipants } })
     const participantsSet = new Set(participants)
 
-    if (users.length !== participants!.length || !participantsSet.has(userId)) {
-      throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_FOUND)
+    if (users.length !== 2 || !participantsSet.has(userId)) {
+      // user not found
+      throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.CANNOT_CREATE_CONVERSATION)
+    }
+    const checkUsersInWorkspace = await workspaceRepo.checkUsersAlreadyInWorkspace(
+      convertedWorkspaceId,
+      convertedParticipants!
+    )
+    if (!checkUsersInWorkspace) {
+      throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_IN_WORKSPACE)
     }
   }
   const conversation = await Conversation.create({
     type,
     channelId: convertedChannelId,
+    workspaceId: type === CONVERSATION_TYPE.DIRECT ? convertedWorkspaceId : undefined,
     participants: type === CONVERSATION_TYPE.CHANNEL ? [] : convertedParticipants
   })
 
   return conversation
 }
-const getDMConversations = async (userId: string) => {
+const getDMConversations = async (userId: string, workspaceId: string) => {
   const uId = convertToObjectId(userId)
+  const wId = convertToObjectId(workspaceId)
   const dmConversations = await Conversation.aggregate([
     {
       $match: {
         type: CONVERSATION_TYPE.DIRECT,
+        workspaceId: wId,
         participants: {
           $in: [uId]
         }
