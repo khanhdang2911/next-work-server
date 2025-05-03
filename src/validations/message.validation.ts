@@ -1,4 +1,5 @@
 import Joi from 'joi'
+import { isEmoji } from '~/utils/common'
 
 const validateCreateMessage = (data: object) => {
   const schema = Joi.object({
@@ -24,4 +25,17 @@ const validateUpdateMessage = (data: object) => {
   return schema.validate(data)
 }
 
-export { validateCreateMessage, validateUpdateMessage }
+const validateReactMessage = (data: object) => {
+  const schema = Joi.object({
+    emoji: Joi.string()
+      .required()
+      .custom((value, helpers) => {
+        if (!isEmoji(value)) {
+          return helpers.error('any.invalid')
+        }
+        return value
+      })
+  })
+  return schema.validate(data)
+}
+export { validateCreateMessage, validateUpdateMessage, validateReactMessage }

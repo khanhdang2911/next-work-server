@@ -27,6 +27,7 @@ const deleteMessage = async (req: Request, res: Response) => {
   const message = await messageService.deleteMessageService(userId, id)
   new SuccessResponse(StatusCodes.OK, SUCCESS_MESSAGES.DELETE_MESSAGE_SUCCESS, message).send(res)
 }
+
 const updateMessage = async (req: Request, res: Response) => {
   const userId = req.userId
   const { id } = req.params
@@ -34,4 +35,12 @@ const updateMessage = async (req: Request, res: Response) => {
   const message = await messageService.updateMessageService(userId, id, data)
   new SuccessResponse(StatusCodes.OK, SUCCESS_MESSAGES.UPDATE_MESSAGE_SUCCESS, message).send(res)
 }
-export { createMessage, getMessages, deleteMessage, updateMessage }
+
+const reactMessage = async (req: Request, res: Response) => {
+  const userId = req.userId
+  const { id } = req.params
+  const message = await messageService.reactMessageService(userId, id, req.body)
+  new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, message!).send(res)
+}
+
+export { createMessage, getMessages, deleteMessage, updateMessage, reactMessage }

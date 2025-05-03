@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import { containerName } from '~/configs/azure.init'
+import emojiRegex from 'emoji-regex'
 
 const convertToObjectId = (id: string) => {
   return new mongoose.Types.ObjectId(id)
@@ -14,4 +15,10 @@ const extractBlobName = (url: string): string => {
   const blobName = pathname.replace(`/${containerName}/`, '')
   return decodeURIComponent(blobName)
 }
-export { convertToObjectId, cleanedMessage, extractBlobName }
+
+function isEmoji(char: string) {
+  const regex = emojiRegex()
+  return regex.test(char)
+}
+
+export { convertToObjectId, cleanedMessage, extractBlobName, isEmoji }
