@@ -9,4 +9,6 @@ messageRouter.post('/', handleUploadManyFile, asyncErrorHandler(messageControlle
 messageRouter.get('/:conversationId', asyncErrorHandler(messageController.getMessages))
 messageRouter.delete('/:id', asyncErrorHandler(messageController.deleteMessage))
 messageRouter.patch('/:id', asyncErrorHandler(messageController.updateMessage))
+// react message
+messageRouter.put('/:id/react', asyncErrorHandler(messageController.reactMessage))
 export default messageRouter

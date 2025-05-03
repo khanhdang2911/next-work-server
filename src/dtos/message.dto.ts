@@ -14,4 +14,8 @@ interface MessageDTO {
     url: string
   }[]
 }
-export { MessageDTO }
+
+interface ReactMessageDTO {
+  emoji: string
+}
+export { MessageDTO, ReactMessageDTO }

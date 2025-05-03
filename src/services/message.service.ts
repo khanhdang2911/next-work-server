@@ -7,7 +7,7 @@ import ERROR_MESSAGES from '~/core/error-message'
 import { Conversation } from '~/models/conversation.model'
 import { CONVERSATION_TYPE } from '~/constants/common.constant'
 import * as channelRepo from '~/repositories/channel.repo'
-import { MessageDTO } from '~/dtos/message.dto'
+import { MessageDTO, ReactMessageDTO } from '~/dtos/message.dto'
 import { deleteFileFromAzure, uploadFileToAzure } from '~/configs/azure.init'
 const createMessageService = async (userId: string, data: MessageDTO, files: Express.Multer.File[]) => {
   const { error } = messageValidation.validateCreateMessage(data)
@@ -128,4 +128,58 @@ const updateMessageService = async (userId: string, messageId: string, data: Mes
   return message
 }
 
-export { createMessageService, getMessagesService, deleteMessageService, updateMessageService }
+const reactMessageService = async (userId: string, messageId: string, data: ReactMessageDTO) => {
+  const { error } = messageValidation.validateReactMessage(data)
+  if (error) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, cleanedMessage(error.message))
+  }
+  const { emoji } = data
+  const uId = convertToObjectId(userId)
+  const mId = convertToObjectId(messageId)
+  const message = await Message.findById(mId)
+  if (!message) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.MESSAGE_NOT_FOUND)
+  }
+  const reaction = message.reactions?.find((r) => r.emoji === emoji)
+  const hasReacted = reaction?.users?.some((user) => user.toString() === userId)
+  if (!reaction) {
+    await Message.updateOne(
+      { _id: mId },
+      {
+        $push: {
+          reactions: { emoji, count: 1, users: [uId] }
+        }
+      }
+    )
+  } else if (hasReacted) {
+    await Message.updateOne(
+      { _id: mId, 'reactions.emoji': emoji },
+      {
+        $inc: { 'reactions.$.count': -1 },
+        $pull: { 'reactions.$.users': uId }
+      }
+    )
+  } else {
+    await Message.updateOne(
+      { _id: mId, 'reactions.emoji': emoji },
+      {
+        $inc: { 'reactions.$.count': 1 },
+        $addToSet: { 'reactions.$.users': uId }
+      }
+    )
+  }
+
+  //delete reaction if this reaction is 0
+  return await Message.findOneAndUpdate(
+    { _id: mId },
+    {
+      $pull: {
+        reactions: { count: 0 }
+      }
+    },
+    {
+      new: true
+    }
+  )
+}
+export { createMessageService, getMessagesService, deleteMessageService, updateMessageService, reactMessageService }
