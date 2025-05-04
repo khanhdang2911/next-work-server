@@ -9,7 +9,6 @@ interface IChannelMember {
 interface IChannel {
   name: string
   description?: string
-  isPrivate: boolean
   isActive?: boolean
   members?: IChannelMember[]
   workspaceId: Types.ObjectId
@@ -41,10 +40,6 @@ const ChannelSchema = new Schema<IChannel>(
     description: {
       type: String,
       required: false
-    },
-    isPrivate: {
-      type: Boolean,
-      default: false
     },
     isActive: {
       type: Boolean,

@@ -26,6 +26,9 @@ const socketHandler = (io: Server) => {
     socket.on('delete-message', (message) => {
       socket.to(message.conversationId).emit('receive-delete-message', message)
     })
+    socket.on('react-message', (message) => {
+      socket.to(message.conversationId).emit('receive-react-message', message)
+    })
 
     socket.on('leave-conversation', (conversationId, userId) => {
       socket.leave(conversationId)
