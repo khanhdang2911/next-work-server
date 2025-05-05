@@ -8,7 +8,7 @@ import checkPermission from '~/middlewares/permission.middleware'
 const userRouter = Router()
 userRouter.use(asyncErrorHandler(authMiddleware))
 //Authenticating the user before accessing the route
-userRouter.get('/', checkPermission('readAny', 'user'), asyncErrorHandler(getAllUsers))
+userRouter.get('/', checkPermission('crud_user'), asyncErrorHandler(getAllUsers))
 userRouter.get('/search/:keyword/:channelId', asyncErrorHandler(searchUser))
 userRouter.get('/:id', asyncErrorHandler(getUserById))
 // update user by id

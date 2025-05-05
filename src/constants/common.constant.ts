@@ -1,6 +1,8 @@
 enum ROLES {
-  ADMIN = 'admin',
-  USER = 'user'
+  USER = 'user',
+  CHANNEL_ADMIN = 'channel_admin',
+  WORKSPACE_ADMIN = 'workspace_admin',
+  ADMIN = 'admin'
 }
 
 const MAX_AGE = 7 * 24 * 60 * 60 * 1000

@@ -12,7 +12,7 @@ interface IUser {
   gender: string
   avatar: string
   status: string
-  role: string
+  roles: string[]
   auth0Id: string
   isActivated: boolean
 }
@@ -44,11 +44,11 @@ const UserSchema = new Schema<IUser>(
       type: String,
       required: false
     },
-    role: {
-      type: String,
-      required: true,
+    roles: {
+      type: [String],
       enum: ROLES,
-      default: ROLES.USER
+      required: true,
+      default: [ROLES.USER]
     },
     auth0Id: {
       type: String,

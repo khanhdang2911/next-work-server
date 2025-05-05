@@ -1,7 +1,7 @@
 interface ConversationDTO {
   type: string
   channelId?: string
-  workspaceId: string
+  workspaceId?: string
   participants?: string[]
 }
 
