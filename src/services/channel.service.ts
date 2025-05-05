@@ -129,7 +129,8 @@ const getChannelsService = async (userId: string, workspaceId: string) => {
         _id: 1,
         name: 1,
         workspaceId: 1,
-        conversationId: '$conversation._id',
+        description: 1,
+        conversationId: '$conversation._id'
       }
     }
   ])

@@ -8,7 +8,8 @@ import * as userValidation from '~/validations/user.validation'
 import { deleteFileFromAzure, uploadFileToAzure } from '~/configs/azure.init'
 import { Channel } from '~/models/channel.model'
 const getALlUsersService = async () => {
-  const users = await User.find()
+  const unselectFields = '-password -refreshToken -createdAt -updatedAt -__v'
+  const users = await User.find().select(unselectFields).lean()
   return users
 }
 
