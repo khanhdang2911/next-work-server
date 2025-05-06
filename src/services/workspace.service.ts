@@ -58,14 +58,9 @@ const inviteUserToWorkspaceService = async (workspaceId: string, userId: string,
   if (checkInvitationExisted) {
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.ALREADY_SEND_INVITATION)
   }
-  const workspace = await Workspace.findOne({
-    _id: wsId,
-    admin: convertToObjectId(userId)
-  })
-    .select('name')
-    .lean()
+  const workspace = await Workspace.findById(wsId).select('name').lean()
   if (!workspace) {
-    throw new ErrorResponse(StatusCodes.FORBIDDEN, ERROR_MESSAGES.NOT_ADMIN_WORKSPACE)
+    throw new ErrorResponse(StatusCodes.FORBIDDEN, ERROR_MESSAGES.WORKSPACE_NOT_FOUND)
   }
   const invitedUser = await User.exists({ email }).lean()
   if (!invitedUser) {

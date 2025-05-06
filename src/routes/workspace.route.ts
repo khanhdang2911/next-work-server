@@ -2,6 +2,7 @@ import { Router } from 'express'
 import * as workspaceController from '~/controllers/workspace.controller'
 import asyncErrorHandler from '~/helpers/async-error-handler'
 import authMiddleware from '~/middlewares/auth.middleware'
+import checkPermission from '~/middlewares/permission.middleware'
 const workspaceRouter = Router()
 
 workspaceRouter.get('/:workspaceId/accept-invitation/:token', asyncErrorHandler(workspaceController.acceptInvitation))
@@ -12,5 +13,9 @@ workspaceRouter.get('/', asyncErrorHandler(workspaceController.getAllWorkspace))
 workspaceRouter.get('/:workspaceId', asyncErrorHandler(workspaceController.getWorkspaceById))
 // workspaceRouter.put('/:workspaceId', asyncErrorHandler(updateWorkspace))
 // workspaceRouter.delete('/:workspaceId', asyncErrorHandler(deleteWorkspace))
-workspaceRouter.post('/:workspaceId/invite', asyncErrorHandler(workspaceController.inviteUserToWorkspace))
+workspaceRouter.post(
+  '/:workspaceId/invite',
+  checkPermission('invite_member_to_workspace'),
+  asyncErrorHandler(workspaceController.inviteUserToWorkspace)
+)
 export default workspaceRouter
