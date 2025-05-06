@@ -43,7 +43,7 @@ const ChannelSchema = new Schema<IChannel>(
     },
     isActive: {
       type: Boolean,
-      default: true
+      default: false
     },
     members: [ChannelMemberSchema],
     workspaceId: {

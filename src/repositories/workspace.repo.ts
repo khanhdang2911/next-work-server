@@ -40,4 +40,18 @@ const checkChannelInWorkspace = async (workspaceId: Types.ObjectId, channel: Typ
   return checkChannelExisted
 }
 
-export { checkChannelsInWorkspace, checkUserAlreadyInWorkspace, checkChannelInWorkspace, checkUsersAlreadyInWorkspace }
+const checkUserIsAdminOfWorkspace = async (workspaceId: Types.ObjectId, userId: Types.ObjectId) => {
+  const checkUserExisted = await Workspace.exists({
+    _id: workspaceId,
+    admin: userId
+  }).lean()
+  return checkUserExisted
+}
+
+export {
+  checkChannelsInWorkspace,
+  checkUserAlreadyInWorkspace,
+  checkChannelInWorkspace,
+  checkUsersAlreadyInWorkspace,
+  checkUserIsAdminOfWorkspace
+}

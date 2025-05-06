@@ -4,6 +4,10 @@ import ErrorResponse from '~/core/error.response'
 import ERROR_MESSAGES from '~/core/error-message'
 import { ReasonPhrases, StatusCodes } from 'http-status-codes'
 import { ROLES } from '~/constants/common.constant'
+import { convertToObjectId } from '~/utils/common'
+import * as channelRepo from '~/repositories/channel.repo'
+import * as workspaceRepo from '~/repositories/workspace.repo'
+import { Types } from 'mongoose'
 
 const role_permissions = [
   {
@@ -12,7 +16,7 @@ const role_permissions = [
   },
   {
     name: ROLES.WORKSPACE_ADMIN,
-    permissions: ['delete_workspace', 'delete_workspace_member', 'delete_channel'],
+    permissions: ['delete_workspace', 'delete_workspace_member', 'delete_channel', 'invite_member_to_workspace'],
     inherits: [ROLES.CHANNEL_ADMIN]
   },
   {
@@ -37,12 +41,32 @@ const getPermissions = (role: string, result = new Set<string>()) => {
   }
   return result
 }
+const CHANNEL_ADMIN_PERMS = getPermissions(ROLES.CHANNEL_ADMIN)
+const WORKSPACE_ADMIN_PERMS = getPermissions(ROLES.WORKSPACE_ADMIN)
+
+const handleChannelAdminPermission = async (action: string, channelId: string, userId: Types.ObjectId) => {
+  if (!CHANNEL_ADMIN_PERMS.has(action)) return
+  const cId = convertToObjectId(channelId)
+  const isChannelAdmin = await channelRepo.checkUserIsAdminOfChannel(cId, userId)
+  if (!isChannelAdmin) {
+    throw new ErrorResponse(StatusCodes.FORBIDDEN, ReasonPhrases.FORBIDDEN)
+  }
+}
+const handleWorkspaceAdminPermission = async (action: string, workspaceId: string, userId: Types.ObjectId) => {
+  if (!WORKSPACE_ADMIN_PERMS.has(action)) return
+  const cId = convertToObjectId(workspaceId)
+  const isWorkspaceAdmin = await workspaceRepo.checkUserIsAdminOfWorkspace(cId, userId)
+  if (!isWorkspaceAdmin) {
+    throw new ErrorResponse(StatusCodes.FORBIDDEN, ReasonPhrases.FORBIDDEN)
+  }
+}
 
 const checkPermission = (action: string) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const user = await User.findById(req.userId)
-      if (!user) {
+      const userId = convertToObjectId(req.userId)
+      const user = await User.findById(userId).lean()
+      if (!user?.roles) {
         throw new ErrorResponse(StatusCodes.UNAUTHORIZED, ERROR_MESSAGES.USER_NOT_FOUND)
       }
       const roles = user.roles
@@ -50,6 +74,14 @@ const checkPermission = (action: string) => {
       roles.forEach((role) => getPermissions(role, allPermissions))
       if (!allPermissions.has(action)) {
         throw new ErrorResponse(StatusCodes.FORBIDDEN, ReasonPhrases.FORBIDDEN)
+      }
+
+      if (CHANNEL_ADMIN_PERMS.has(action)) {
+        await handleChannelAdminPermission(action, req.params.channelId, userId)
+      }
+
+      if (WORKSPACE_ADMIN_PERMS.has(action)) {
+        await handleWorkspaceAdminPermission(action, req.params.workspaceId, userId)
       }
       next()
     } catch (error) {
