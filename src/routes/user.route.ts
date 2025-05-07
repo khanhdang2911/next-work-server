@@ -1,14 +1,15 @@
 import { Router } from 'express'
-import { getAllUsers, getUserById, searchUser, updateUserById } from '~/controllers/user.controller'
+import { getUserById, searchUser, updateUserById } from '~/controllers/user.controller'
 import asyncErrorHandler from '~/helpers/async-error-handler'
 import authMiddleware from '~/middlewares/auth.middleware'
+import checkLockAccount from '~/middlewares/check-lock-account'
 import { handleUploadSingleFile } from '~/middlewares/handle-upload'
-import checkPermission from '~/middlewares/permission.middleware'
 
 const userRouter = Router()
 userRouter.use(asyncErrorHandler(authMiddleware))
+userRouter.use(asyncErrorHandler(checkLockAccount))
+
 //Authenticating the user before accessing the route
-userRouter.get('/', checkPermission('crud_user'), asyncErrorHandler(getAllUsers))
 userRouter.get('/search/:keyword/:channelId', asyncErrorHandler(searchUser))
 userRouter.get('/:id', asyncErrorHandler(getUserById))
 // update user by id

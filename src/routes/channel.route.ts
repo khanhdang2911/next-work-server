@@ -4,9 +4,10 @@ const channelRouter = Router()
 import * as channelController from '~/controllers/channel.controller'
 import asyncErrorHandler from '~/helpers/async-error-handler'
 import authMiddleware from '~/middlewares/auth.middleware'
+import checkLockAccount from '~/middlewares/check-lock-account'
 import checkPermission from '~/middlewares/permission.middleware'
 channelRouter.use(asyncErrorHandler(authMiddleware))
-
+channelRouter.use(asyncErrorHandler(checkLockAccount))
 // create channel
 channelRouter.post('/:workspaceId', asyncErrorHandler(channelController.createChannel))
 channelRouter.post(

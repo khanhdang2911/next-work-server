@@ -7,13 +7,8 @@ import { cleanedMessage, extractBlobName } from '~/utils/common'
 import * as userValidation from '~/validations/user.validation'
 import { deleteFileFromAzure, uploadFileToAzure } from '~/configs/azure.init'
 import { Channel } from '~/models/channel.model'
-const getALlUsersService = async () => {
-  const unselectFields = '-password -refreshToken -createdAt -updatedAt -__v'
-  const users = await User.find().select(unselectFields).lean()
-  return users
-}
 
-const searchUserService = async (keyword: string, channelId: string, userId: string) => {
+const searchUserService = async (query: string, channelId: string, userId: string) => {
   const usersInChannel = await Channel.findOne({
     _id: channelId,
     'members.user': userId
@@ -21,10 +16,11 @@ const searchUserService = async (keyword: string, channelId: string, userId: str
   if (!usersInChannel) {
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_IN_CHANNEL)
   }
+  const regex = new RegExp(query, 'i') // i = case-insensitive
   const usersId = usersInChannel?.members?.map((member) => member.user)
   const users = await User.find({
     _id: { $in: usersId },
-    $text: { $search: keyword }
+    $or: [{ name: regex }, { email: regex }]
   }).select('name avatar')
   return users
 }
@@ -59,6 +55,9 @@ const updateUserByIdService = async (userId: string, data: UserUpdateDTO, file: 
   })
   // delete file from azure
   if (file) deleteFileFromAzure(extractBlobName(user.avatar))
+  if (!userUpdated) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.UPDATE_USER_FAIL)
+  }
   return userUpdated
 }
-export { getALlUsersService, searchUserService, getUserByIdService, updateUserByIdService }
+export { searchUserService, getUserByIdService, updateUserByIdService }
