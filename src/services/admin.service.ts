@@ -7,13 +7,13 @@ import { ROLES } from '~/constants/common.constant'
 import { validateUpdateUser } from '~/validations/user.validation'
 import { cleanedMessage } from '~/utils/common'
 
+const unselectFields = {
+  __v: 0,
+  password: 0,
+  refreshToken: 0,
+  accessToken: 0
+}
 const getALlUsersService = async () => {
-  const unselectFields = {
-    __v: 0,
-    password: 0,
-    refreshToken: 0,
-    accessToken: 0
-  }
   const users = await User.aggregate([
     {
       $lookup: {
@@ -93,10 +93,37 @@ const updateUserService = async (updateUserId: string, data: UserUpdateAdminDTO)
 
 const searchUsersService = async (query: string) => {
   const regex = new RegExp(query, 'i') // i = case-insensitive
-  const users = await User.find({
-    $or: [{ name: regex }, { email: regex }]
-  }).select('-__v -password -refreshToken -accessToken')
-
+  const users = await User.aggregate([
+    {
+      $match: {
+        $or: [{ name: regex }, { email: regex }]
+      }
+    },
+    {
+      $lookup: {
+        from: 'workspaces',
+        localField: '_id',
+        foreignField: 'members.user',
+        as: 'workspaces'
+      }
+    },
+    {
+      $addFields: {
+        numberOfWorkspaces: { $size: '$workspaces' }
+      }
+    },
+    {
+      $sort: {
+        numberOfWorkspaces: -1
+      }
+    },
+    {
+      $project: {
+        ...unselectFields,
+        workspaces: 0
+      }
+    }
+  ])
   return users
 }
 
