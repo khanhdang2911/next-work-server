@@ -23,23 +23,13 @@ const generateToken = (payload: object) => {
 }
 
 const validateToken = async (token: string) => {
-  try {
-    const decoded = await jwt.verify(token, process.env.SECRET_PASSWORD!)
-    return decoded
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (e) {
-    throw new ErrorResponse(StatusCodes.UNAUTHORIZED, ReasonPhrases.UNAUTHORIZED)
-  }
+  const decoded = jwt.verify(token, process.env.SECRET_PASSWORD!)
+  return decoded
 }
 
 const validateTokenV2 = async (token: string) => {
-  try {
-    const decoded = await jwt.verify(token, process.env.SECRET_PASSWORD!, { ignoreExpiration: true })
-    return decoded
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (e) {
-    throw new ErrorResponse(StatusCodes.UNAUTHORIZED, ReasonPhrases.UNAUTHORIZED)
-  }
+  const decoded = jwt.verify(token, process.env.SECRET_PASSWORD!, { ignoreExpiration: true })
+  return decoded
 }
 const loginService = async (email: string, password: string) => {
   const { error } = loginValidation({ email, password })
@@ -48,6 +38,7 @@ const loginService = async (email: string, password: string) => {
   if (!user) throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.INVALID_CREDENTIALS)
   const validPassword = await bcrypt.compare(password, user.password)
   if (!validPassword) throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.INVALID_CREDENTIALS)
+  if (user.isLocked) throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.ACCOUNT_IS_BLOCKED)
   if (!user.isActivated) {
     await sendMailVerification(email)
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.ACCOUNT_NOT_ACTIVATED)

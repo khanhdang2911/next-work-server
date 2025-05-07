@@ -31,6 +31,9 @@ const SUCCESS_MESSAGES = {
   CREATE_CONVERSATION_SUCCESS: 'Create conversation successfully.',
   GET_MESSAGES_SUCCESS: 'Get messages successfully.',
   DELETE_MESSAGE_SUCCESS: 'Delete message successfully.',
-  UPDATE_MESSAGE_SUCCESS: 'Update message successfully.'
+  UPDATE_MESSAGE_SUCCESS: 'Update message successfully.',
+  //admin
+  USER_BLOCKED_SUCCESSFULLY: 'User blocked successfully.',
+  USER_UNBLOCKED_SUCCESSFULLY: 'User unblocked successfully.'
 }
 export default SUCCESS_MESSAGES

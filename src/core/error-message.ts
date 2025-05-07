@@ -4,6 +4,8 @@ const ERROR_MESSAGES = {
   INVALID_CREDENTIALS: 'Email or password is incorrect.',
   ACCOUNT_NOT_ACTIVATED: 'Your account is not activated, please check your email to activate account and try again',
   EMAIL_ALREADY_EXIST: 'Email is already exist.',
+  ACCOUNT_IS_BLOCKED: 'Your account is blocked, please contact admin to unlock your account.',
+  UPDATE_USER_FAIL: 'Update user failed, please try again.',
   // mail
   CHECK_EMAIL: 'Please check your email to verify your account and try again...',
   INVALID_OTP: 'Invalid OTP token.',
@@ -35,6 +37,10 @@ const ERROR_MESSAGES = {
   // message
   MESSAGE_NOT_FOUND: 'Message not found.',
   // conversation
-  CANNOT_CREATE_CONVERSATION: 'You can not create this conversation.'
+  CANNOT_CREATE_CONVERSATION: 'You can not create this conversation.',
+  //admin
+  CAN_NOT_BLOCK_YOURSELF: 'You can not block yourself.',
+  CAN_NOT_UNBLOCK_YOURSELF: 'You can not unlock yourself.',
+  INVALID_ROLE: 'Invalid role'
 }
 export default ERROR_MESSAGES

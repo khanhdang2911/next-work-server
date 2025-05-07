@@ -36,7 +36,7 @@ const Logout = async (req: Request, res: Response) => {
 const generateRefreshToken = async (req: Request, res: Response) => {
   const refreshToken = req.cookies.refreshToken
   const userId = req.userId
-  const newAccessToken = await generateRefreshTokenService(refreshToken!, userId)
+  const newAccessToken = await generateRefreshTokenService(refreshToken, userId)
   new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, newAccessToken).send(res)
 }
 

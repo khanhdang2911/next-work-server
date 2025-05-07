@@ -15,7 +15,7 @@ interface IUser {
   roles: string[]
   auth0Id: string
   isActivated: boolean
-  isLock: boolean
+  isLocked: boolean
 }
 
 const UserSchema = new Schema<IUser>(
@@ -64,7 +64,7 @@ const UserSchema = new Schema<IUser>(
       type: String,
       enum: USER_STATUS
     },
-    isLock: {
+    isLocked: {
       type: Boolean,
       required: true,
       default: false

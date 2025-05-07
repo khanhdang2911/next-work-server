@@ -3,8 +3,11 @@ import asyncErrorHandler from '~/helpers/async-error-handler'
 import authMiddleware from '~/middlewares/auth.middleware'
 import * as messageController from '~/controllers/message.controller'
 import { handleUploadManyFile } from '~/middlewares/handle-upload'
+import checkLockAccount from '~/middlewares/check-lock-account'
 const messageRouter = Router()
 messageRouter.use(asyncErrorHandler(authMiddleware))
+messageRouter.use(asyncErrorHandler(checkLockAccount))
+
 messageRouter.post('/', handleUploadManyFile, asyncErrorHandler(messageController.createMessage))
 messageRouter.get('/:conversationId', asyncErrorHandler(messageController.getMessages))
 messageRouter.delete('/:id', asyncErrorHandler(messageController.deleteMessage))
