@@ -9,7 +9,7 @@ const authV2Middleware = async (req: Request, res: Response, next: NextFunction)
   if (!accessToken) {
     throw new ErrorResponse(StatusCodes.UNAUTHORIZED, ReasonPhrases.UNAUTHORIZED)
   }
-  const decodedToken = (await validateTokenV2(accessToken)) as JwtPayload
+  const decodedToken = validateTokenV2(accessToken) as JwtPayload
   if (!decodedToken) {
     throw new ErrorResponse(StatusCodes.UNAUTHORIZED, ReasonPhrases.UNAUTHORIZED)
   }

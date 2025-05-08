@@ -1,5 +1,14 @@
 import { Router } from 'express'
-import { getAllUsers, lockUser, searchUsers, unlockUser, updateUser } from '~/controllers/admin.controller'
+import {
+  deleteWorkspace,
+  getAllUsers,
+  getAllWorkspaces,
+  lockUser,
+  searchUsers,
+  searchWorkspaces,
+  unlockUser,
+  updateUser
+} from '~/controllers/admin.controller'
 import asyncErrorHandler from '~/helpers/async-error-handler'
 import authMiddleware from '~/middlewares/auth.middleware'
 import checkLockAccount from '~/middlewares/check-lock-account'
@@ -15,4 +24,9 @@ adminRouter.put('/users/lock/:lock_userId', asyncErrorHandler(lockUser))
 adminRouter.put('/users/unlock/:unlock_userId', asyncErrorHandler(unlockUser))
 adminRouter.patch('/users/:update_userId', asyncErrorHandler(updateUser))
 adminRouter.get('/users/search/:query', asyncErrorHandler(searchUsers))
+// workspaces
+adminRouter.get('/workspaces', asyncErrorHandler(getAllWorkspaces))
+adminRouter.delete('/workspaces/:workspaceId', asyncErrorHandler(deleteWorkspace))
+adminRouter.get('/workspaces/search/:query', asyncErrorHandler(searchWorkspaces))
+adminRouter.get('/workspaces/search/:query', asyncErrorHandler(searchWorkspaces))
 export default adminRouter

@@ -4,7 +4,9 @@ import SUCCESS_MESSAGES from '~/core/success-message'
 import SuccessResponse from '~/core/success.response'
 import * as adminService from '~/services/admin.service'
 const getAllUsers = async (req: Request, res: Response) => {
-  const users = await adminService.getALlUsersService()
+  const limit = Number(req.query.limit) || 15
+  const page = Number(req.query.page) || 1
+  const users = await adminService.getALlUsersService(limit, page)
   new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, users).send(res)
 }
 
@@ -31,7 +33,39 @@ const updateUser = async (req: Request, res: Response) => {
 
 const searchUsers = async (req: Request, res: Response) => {
   const query = req.params.query
-  const users = await adminService.searchUsersService(query)
+  const limit = Number(req.query.limit) || 15
+  const page = Number(req.query.page) || 1
+  const users = await adminService.searchUsersService(query, limit, page)
   new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, users).send(res)
 }
-export { getAllUsers, lockUser, unlockUser, updateUser, searchUsers }
+
+const getAllWorkspaces = async (req: Request, res: Response) => {
+  const limit = Number(req.query.limit) || 15
+  const page = Number(req.query.page) || 1
+  const workspaces = await adminService.getAllWorkspacesService(limit, page)
+  new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, workspaces).send(res)
+}
+
+const deleteWorkspace = async (req: Request, res: Response) => {
+  const workspaceId = req.params.workspaceId
+  await adminService.deleteWorkspaceService(workspaceId)
+  new SuccessResponse(StatusCodes.OK, SUCCESS_MESSAGES.WORKSPACE_DELETED_SUCCESSFULLY).send(res)
+}
+
+const searchWorkspaces = async (req: Request, res: Response) => {
+  const query = req.params.query
+  const limit = Number(req.query.limit) || 15
+  const page = Number(req.query.page) || 1
+  const workspaces = await adminService.searchWorkspacesService(query, limit, page)
+  new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, workspaces).send(res)
+}
+export {
+  getAllUsers,
+  lockUser,
+  unlockUser,
+  updateUser,
+  searchUsers,
+  getAllWorkspaces,
+  deleteWorkspace,
+  searchWorkspaces
+}

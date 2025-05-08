@@ -22,12 +22,12 @@ const generateToken = (payload: object) => {
   return acccessToken
 }
 
-const validateToken = async (token: string) => {
+const validateToken = (token: string) => {
   const decoded = jwt.verify(token, process.env.SECRET_PASSWORD!)
   return decoded
 }
 
-const validateTokenV2 = async (token: string) => {
+const validateTokenV2 = (token: string) => {
   const decoded = jwt.verify(token, process.env.SECRET_PASSWORD!, { ignoreExpiration: true })
   return decoded
 }

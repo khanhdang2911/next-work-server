@@ -6,41 +6,22 @@ import { User } from '~/models/user.model'
 import { ROLES } from '~/constants/common.constant'
 import { validateUpdateUser } from '~/validations/user.validation'
 import { cleanedMessage } from '~/utils/common'
+import { Workspace } from '~/models/workspace.model'
+import mongoose from 'mongoose'
+import { Channel } from '~/models/channel.model'
+import { Message } from '~/models/message.model'
+import { getAllWorkspaceQuery } from '~/repositories/workspace.repo'
+import { getAllUserQuery } from '~/repositories/user.repo'
 
-const unselectFields = {
-  __v: 0,
-  password: 0,
-  refreshToken: 0,
-  accessToken: 0
-}
-const getALlUsersService = async () => {
-  const users = await User.aggregate([
-    {
-      $lookup: {
-        from: 'workspaces',
-        localField: '_id',
-        foreignField: 'members.user',
-        as: 'workspaces'
-      }
-    },
-    {
-      $addFields: {
-        numberOfWorkspaces: { $size: '$workspaces' }
-      }
-    },
-    {
-      $sort: {
-        numberOfWorkspaces: -1
-      }
-    },
-    {
-      $project: {
-        ...unselectFields,
-        workspaces: 0
-      }
-    }
-  ])
-  return users
+const getALlUsersService = async (limit: number, page: number) => {
+  const users = await User.aggregate([...getAllUserQuery(limit, page)])
+  const totalDocs = await User.countDocuments()
+  const totalPages = Math.ceil(totalDocs / limit)
+  return {
+    users,
+    currentPage: page,
+    totalPages: totalPages
+  }
 }
 
 const blockUserService = async (lockUserId: string, userId: string) => {
@@ -91,40 +72,82 @@ const updateUserService = async (updateUserId: string, data: UserUpdateAdminDTO)
   return user
 }
 
-const searchUsersService = async (query: string) => {
-  const regex = new RegExp(query, 'i') // i = case-insensitive
-  const users = await User.aggregate([
-    {
-      $match: {
-        $or: [{ name: regex }, { email: regex }]
-      }
-    },
-    {
-      $lookup: {
-        from: 'workspaces',
-        localField: '_id',
-        foreignField: 'members.user',
-        as: 'workspaces'
-      }
-    },
-    {
-      $addFields: {
-        numberOfWorkspaces: { $size: '$workspaces' }
-      }
-    },
-    {
-      $sort: {
-        numberOfWorkspaces: -1
-      }
-    },
-    {
-      $project: {
-        ...unselectFields,
-        workspaces: 0
-      }
-    }
-  ])
-  return users
+const searchUsersService = async (query: string, limit: number, page: number) => {
+  const regex = new RegExp(query, 'i')
+  const filter = {
+    $or: [{ name: regex }, { email: regex }]
+  }
+
+  const totalDocs = await User.countDocuments(filter)
+  const totalPages = Math.ceil(totalDocs / limit)
+
+  const users = await User.aggregate([{ $match: filter }, ...getAllUserQuery(limit, page)])
+
+  return {
+    users,
+    currentPage: page,
+    totalPages
+  }
 }
 
-export { getALlUsersService, blockUserService, unlockUserService, updateUserService, searchUsersService }
+// workspaces
+const getAllWorkspacesService = async (limit: number, page: number) => {
+  const workspaces = await Workspace.aggregate([...getAllWorkspaceQuery(limit, page)])
+  const totalDocs = await Workspace.countDocuments()
+  const totalPages = Math.ceil(totalDocs / limit)
+
+  return {
+    workspaces,
+    currentPage: page,
+    totalPages
+  }
+}
+
+const deleteWorkspaceService = async (workspaceId: string) => {
+  const session = await mongoose.startSession()
+  try {
+    await session.withTransaction(async () => {
+      const result = await Workspace.deleteOne({ _id: workspaceId }).session(session)
+      if (result.deletedCount === 0) {
+        throw new Error()
+      }
+      await Channel.deleteMany({ workspaceId }).session(session)
+      await Message.deleteMany({ workspaceId }).session(session)
+    })
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    throw new ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, ERROR_MESSAGES.DELETE_WORKSPACE_FAIL)
+  } finally {
+    session.endSession()
+  }
+}
+
+const searchWorkspacesService = async (query: string, limit: number, page: number) => {
+  const regex = new RegExp(query, 'i')
+  const filter = {
+    $or: [{ name: regex }]
+  }
+  const workspaces = await Workspace.aggregate([
+    {
+      $match: filter
+    },
+    ...getAllWorkspaceQuery(limit, page)
+  ])
+  const totalDocs = await Workspace.countDocuments(filter)
+  const totalPages = Math.ceil(totalDocs / limit)
+  return {
+    workspaces,
+    currentPage: page,
+    totalPages
+  }
+}
+export {
+  getALlUsersService,
+  blockUserService,
+  unlockUserService,
+  updateUserService,
+  searchUsersService,
+  getAllWorkspacesService,
+  deleteWorkspaceService,
+  searchWorkspacesService
+}
