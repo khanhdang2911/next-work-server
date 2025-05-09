@@ -12,6 +12,7 @@ import { Channel } from '~/models/channel.model'
 import { Message } from '~/models/message.model'
 import { getAllWorkspaceQuery } from '~/repositories/workspace.repo'
 import { getAllUserQuery } from '~/repositories/user.repo'
+import { Conversation } from '~/models/conversation.model'
 
 const getALlUsersService = async (limit: number, page: number) => {
   const users = await User.aggregate([...getAllUserQuery(limit, page)])
@@ -111,8 +112,16 @@ const deleteWorkspaceService = async (workspaceId: string) => {
       if (result.deletedCount === 0) {
         throw new Error()
       }
-      await Channel.deleteMany({ workspaceId }).session(session)
-      await Message.deleteMany({ workspaceId }).session(session)
+      const channels = await Channel.find({ workspaceId }).session(session)
+      const channelIds = channels.map((channel) => channel._id)
+      //conversations
+      const conversations = await Conversation.find({
+        $or: [{ channelId: { $in: channelIds } }, { workspaceId }]
+      }).session(session)
+      const conversationIds = conversations.map((conversation) => conversation._id)
+      await Message.deleteMany({ conversationId: { $in: conversationIds } }).session(session)
+      await Conversation.deleteMany({ _id: { $in: conversationIds } }).session(session)
+      await Channel.deleteMany({ _id: { $in: channelIds } }).session(session)
     })
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {

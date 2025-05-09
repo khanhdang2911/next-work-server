@@ -35,6 +35,8 @@ const SUCCESS_MESSAGES = {
   //admin
   USER_BLOCKED_SUCCESSFULLY: 'User blocked successfully.',
   USER_UNBLOCKED_SUCCESSFULLY: 'User unblocked successfully.',
-  WORKSPACE_DELETED_SUCCESSFULLY: 'Workspace deleted successfully.'
+  WORKSPACE_DELETED_SUCCESSFULLY: 'Workspace deleted successfully.',
+  UPDATE_CHANNEL_SUCCESS: 'Update channel successfully.',
+  DELETE_CHANNEL_SUCCESS: 'Delete channel successfully.'
 }
 export default SUCCESS_MESSAGES

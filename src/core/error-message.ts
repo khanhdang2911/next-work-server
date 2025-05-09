@@ -42,6 +42,9 @@ const ERROR_MESSAGES = {
   CAN_NOT_BLOCK_YOURSELF: 'You can not block yourself.',
   CAN_NOT_UNBLOCK_YOURSELF: 'You can not unlock yourself.',
   INVALID_ROLE: 'Invalid role',
-  DELETE_WORKSPACE_FAIL: 'Delete workspace failed, please try again later.'
+  DELETE_WORKSPACE_FAIL: 'Delete workspace failed, please try again later.',
+  UPDATE_CHANNEL_FAILED: 'Update channel failed, please try again later.',
+  NAME_CHANNEL_EXISTED: 'Channel name already existed, please choose another name.',
+  DELETE_CHANNEL_FAILED: 'Delete channel failed, please try again later.'
 }
 export default ERROR_MESSAGES
