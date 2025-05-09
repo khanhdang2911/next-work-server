@@ -12,7 +12,7 @@ interface IChannel {
   isActive?: boolean
   members?: IChannelMember[]
   workspaceId: Types.ObjectId
-  admin: Types.ObjectId[]
+  admin: Types.ObjectId
 }
 const ChannelMemberSchema = new Schema<IChannelMember>(
   {
@@ -52,7 +52,7 @@ const ChannelSchema = new Schema<IChannel>(
       ref: 'workspace'
     },
     admin: {
-      type: [Schema.Types.ObjectId],
+      type: Schema.Types.ObjectId,
       required: true,
       ref: 'user'
     }

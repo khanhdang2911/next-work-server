@@ -16,7 +16,14 @@ const role_permissions = [
   },
   {
     name: ROLES.WORKSPACE_ADMIN,
-    permissions: ['delete_workspace', 'delete_workspace_member', 'delete_channel', 'invite_member_to_workspace'],
+    permissions: [
+      'delete_workspace',
+      'delete_workspace_member',
+      'delete_channel',
+      'read_channels',
+      'update_channel',
+      'invite_member_to_workspace'
+    ],
     inherits: [ROLES.CHANNEL_ADMIN]
   },
   {
