@@ -10,13 +10,51 @@ import { Workspace } from '~/models/workspace.model'
 import mongoose from 'mongoose'
 import { Channel } from '~/models/channel.model'
 import { Message } from '~/models/message.model'
-import { getAllWorkspaceQuery } from '~/repositories/workspace.repo'
-import { getAllUserQuery } from '~/repositories/user.repo'
 import { Conversation } from '~/models/conversation.model'
+import { unselectUserFields } from '~/repositories/user.repo'
 
-const getALlUsersService = async (limit: number, page: number) => {
-  const users = await User.aggregate([...getAllUserQuery(limit, page)])
-  const totalDocs = await User.countDocuments()
+const getALlUsersService = async (limit: number, page: number, query: string) => {
+  const queryRegex = new RegExp(query, 'i')
+  const skip = (page - 1) * limit
+  const filter = {
+    $or: [{ email: queryRegex }, { name: queryRegex }]
+  }
+  const result = await User.aggregate([
+    {
+      $match: filter
+    },
+    {
+      $lookup: {
+        from: 'workspaces',
+        localField: '_id',
+        foreignField: 'members.user',
+        as: 'workspaces'
+      }
+    },
+    {
+      $addFields: {
+        numberOfWorkspaces: { $size: '$workspaces' }
+      }
+    },
+    {
+      $facet: {
+        users: [
+          { $sort: { createdAt: -1 } },
+          { $skip: skip },
+          { $limit: limit },
+          {
+            $project: {
+              ...unselectUserFields,
+              workspaces: 0
+            }
+          }
+        ],
+        totalCount: [{ $count: 'count' }]
+      }
+    }
+  ])
+  const users = result[0].users
+  const totalDocs = result[0].totalCount[0]?.count ?? 0
   const totalPages = Math.ceil(totalDocs / limit)
   return {
     users,
@@ -73,28 +111,72 @@ const updateUserService = async (updateUserId: string, data: UserUpdateAdminDTO)
   return user
 }
 
-const searchUsersService = async (query: string, limit: number, page: number) => {
-  const regex = new RegExp(query, 'i')
-  const filter = {
-    $or: [{ name: regex }, { email: regex }]
-  }
-
-  const totalDocs = await User.countDocuments(filter)
-  const totalPages = Math.ceil(totalDocs / limit)
-
-  const users = await User.aggregate([{ $match: filter }, ...getAllUserQuery(limit, page)])
-
-  return {
-    users,
-    currentPage: page,
-    totalPages
-  }
-}
-
 // workspaces
-const getAllWorkspacesService = async (limit: number, page: number) => {
-  const workspaces = await Workspace.aggregate([...getAllWorkspaceQuery(limit, page)])
-  const totalDocs = await Workspace.countDocuments()
+const getAllWorkspacesService = async (limit: number, page: number, query: string = '') => {
+  const queryRegex = new RegExp(query, 'i')
+  const skip = (page - 1) * limit
+  const result = await Workspace.aggregate([
+    {
+      $match: {
+        name: queryRegex
+      }
+    },
+    {
+      $lookup: {
+        from: 'channels',
+        localField: '_id',
+        foreignField: 'workspaceId',
+        as: 'channels'
+      }
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'admin',
+        foreignField: '_id',
+        as: 'admin'
+      }
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'members.user',
+        foreignField: '_id',
+        as: 'members'
+      }
+    },
+    {
+      $unwind: '$admin'
+    },
+    {
+      $addFields: {
+        numberOfChannels: { $size: '$channels' },
+        numberOfMembers: { $size: '$members' }
+      }
+    },
+    {
+      $facet: {
+        workspaces: [
+          { $sort: { createdAt: -1 } },
+          { $skip: skip },
+          { $limit: limit },
+          {
+            $project: {
+              __v: 0,
+              channels: 0,
+              members: 0,
+              admin: {
+                ...unselectUserFields
+              }
+            }
+          }
+        ],
+        totalCount: [{ $count: 'count' }]
+      }
+    }
+  ])
+  const workspaces = result[0].workspaces
+  const totalDocs = result[0].totalCount[0]?.count ?? 0
   const totalPages = Math.ceil(totalDocs / limit)
 
   return {
@@ -130,33 +212,11 @@ const deleteWorkspaceService = async (workspaceId: string) => {
     session.endSession()
   }
 }
-
-const searchWorkspacesService = async (query: string, limit: number, page: number) => {
-  const regex = new RegExp(query, 'i')
-  const filter = {
-    $or: [{ name: regex }]
-  }
-  const workspaces = await Workspace.aggregate([
-    {
-      $match: filter
-    },
-    ...getAllWorkspaceQuery(limit, page)
-  ])
-  const totalDocs = await Workspace.countDocuments(filter)
-  const totalPages = Math.ceil(totalDocs / limit)
-  return {
-    workspaces,
-    currentPage: page,
-    totalPages
-  }
-}
 export {
   getALlUsersService,
   blockUserService,
   unlockUserService,
   updateUserService,
-  searchUsersService,
   getAllWorkspacesService,
-  deleteWorkspaceService,
-  searchWorkspacesService
+  deleteWorkspaceService
 }

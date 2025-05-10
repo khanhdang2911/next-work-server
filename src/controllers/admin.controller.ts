@@ -6,7 +6,8 @@ import * as adminService from '~/services/admin.service'
 const getAllUsers = async (req: Request, res: Response) => {
   const limit = Number(req.query.limit) || 15
   const page = Number(req.query.page) || 1
-  const users = await adminService.getALlUsersService(limit, page)
+  const query = req.query.query as string
+  const users = await adminService.getALlUsersService(limit, page, query)
   new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, users).send(res)
 }
 
@@ -31,18 +32,11 @@ const updateUser = async (req: Request, res: Response) => {
   new SuccessResponse(StatusCodes.OK, SUCCESS_MESSAGES.UPDATE_USER_SUCCESS, user).send(res)
 }
 
-const searchUsers = async (req: Request, res: Response) => {
-  const query = req.params.query
-  const limit = Number(req.query.limit) || 15
-  const page = Number(req.query.page) || 1
-  const users = await adminService.searchUsersService(query, limit, page)
-  new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, users).send(res)
-}
-
 const getAllWorkspaces = async (req: Request, res: Response) => {
   const limit = Number(req.query.limit) || 15
   const page = Number(req.query.page) || 1
-  const workspaces = await adminService.getAllWorkspacesService(limit, page)
+  const query = req.query.query as string
+  const workspaces = await adminService.getAllWorkspacesService(limit, page, query)
   new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, workspaces).send(res)
 }
 
@@ -51,21 +45,4 @@ const deleteWorkspace = async (req: Request, res: Response) => {
   await adminService.deleteWorkspaceService(workspaceId)
   new SuccessResponse(StatusCodes.OK, SUCCESS_MESSAGES.WORKSPACE_DELETED_SUCCESSFULLY).send(res)
 }
-
-const searchWorkspaces = async (req: Request, res: Response) => {
-  const query = req.params.query
-  const limit = Number(req.query.limit) || 15
-  const page = Number(req.query.page) || 1
-  const workspaces = await adminService.searchWorkspacesService(query, limit, page)
-  new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, workspaces).send(res)
-}
-export {
-  getAllUsers,
-  lockUser,
-  unlockUser,
-  updateUser,
-  searchUsers,
-  getAllWorkspaces,
-  deleteWorkspace,
-  searchWorkspaces
-}
+export { getAllUsers, lockUser, unlockUser, updateUser, getAllWorkspaces, deleteWorkspace }

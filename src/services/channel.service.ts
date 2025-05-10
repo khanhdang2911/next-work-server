@@ -171,7 +171,7 @@ const getChannelMembersService = async (userId: string, channelId: string) => {
         joinedAt: '$members.joinedAt',
         admin: {
           $cond: {
-            if: { $in: ['$userInfo._id', '$admin'] },
+            if: { $eq: ['$userInfo._id', '$admin'] },
             then: true,
             else: false
           }

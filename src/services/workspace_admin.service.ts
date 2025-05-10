@@ -5,16 +5,22 @@ import { ChannelUpdateDTO } from '~/dtos/channel.dto'
 import { Channel } from '~/models/channel.model'
 import { Conversation } from '~/models/conversation.model'
 import { Message } from '~/models/message.model'
+import { User } from '~/models/user.model'
+import { Workspace } from '~/models/workspace.model'
 import { cleanedMessage, convertToObjectId } from '~/utils/common'
 import { validateCreateChannel } from '~/validations/channel.validation'
+import * as workspaceRepo from '~/repositories/workspace.repo'
+import * as channelRepo from '~/repositories/channel.repo'
 
-const getAllChannelsService = async (workspaceId: string, limit: number, page: number) => {
+const getAllChannelsService = async (workspaceId: string, limit: number, page: number, query: string = '') => {
+  const queryRegex = new RegExp(query, 'i')
   const skip = (page - 1) * limit
   const wId = convertToObjectId(workspaceId)
-  const channels = await Channel.aggregate([
+  const result = await Channel.aggregate([
     {
       $match: {
-        workspaceId: wId
+        workspaceId: wId,
+        name: queryRegex
       }
     },
     {
@@ -29,27 +35,32 @@ const getAllChannelsService = async (workspaceId: string, limit: number, page: n
       $unwind: '$admin'
     },
     {
-      $skip: skip
-    },
-    {
-      $limit: limit
-    },
-    {
-      $project: {
-        name: 1,
-        description: 1,
-        isActive: 1,
-        workspaceId: 1,
-        members: { $size: '$members' },
-        admin: {
-          email: '$admin.email',
-          name: '$admin.name'
-        },
-        createdAt: 1
+      $facet: {
+        channels: [
+          { $sort: { createdAt: -1 } },
+          { $skip: skip },
+          { $limit: limit },
+          {
+            $project: {
+              name: 1,
+              description: 1,
+              isActive: 1,
+              workspaceId: 1,
+              members: { $size: '$members' },
+              admin: {
+                email: '$admin.email',
+                name: '$admin.name'
+              },
+              createdAt: 1
+            }
+          }
+        ],
+        totalCount: [{ $count: 'count' }]
       }
     }
   ])
-  const totalDocs = await Channel.countDocuments({ workspaceId: wId })
+  const channels = result[0].channels
+  const totalDocs = result[0].totalCount[0]?.count ?? 0
   const totalPages = Math.ceil(totalDocs / limit)
 
   return {
@@ -103,56 +114,97 @@ const deleteChannelService = async (workspaceId: string, channelId: string) => {
   }
 }
 
-const searchChannelsService = async (workspaceId: string, query: string, limit: number, page: number) => {
-  console.log('query', query)
+// manage users
+const getAllUserInWorkspaceService = async (workspaceId: string, limit: number, page: number, query = '') => {
   const skip = (page - 1) * limit
+  const queryRegex = new RegExp(query, 'i')
   const wId = convertToObjectId(workspaceId)
-  const regex = new RegExp(query, 'i')
-  const channels = await Channel.aggregate([
-    {
-      $match: {
-        workspaceId: wId,
-        name: regex
-      }
-    },
+
+  const result = await Workspace.aggregate([
+    { $match: { _id: wId } },
+    { $unwind: '$members' },
     {
       $lookup: {
         from: 'users',
-        localField: 'admin',
+        localField: 'members.user',
         foreignField: '_id',
-        as: 'admin'
+        as: 'userInfo'
+      }
+    },
+    { $unwind: '$userInfo' },
+    {
+      $match: {
+        $or: [{ 'userInfo.name': queryRegex }, { 'userInfo.email': queryRegex }]
       }
     },
     {
-      $unwind: '$admin'
-    },
-    {
-      $skip: skip
-    },
-    {
-      $limit: limit
-    },
-    {
-      $project: {
-        name: 1,
-        description: 1,
-        isActive: 1,
-        workspaceId: 1,
-        members: { $size: '$members' },
-        admin: {
-          email: '$admin.email',
-          name: '$admin.name'
-        },
-        createdAt: 1
+      $facet: {
+        users: [
+          { $sort: { 'members.joinedAt': -1 } },
+          { $skip: skip },
+          { $limit: limit },
+          {
+            $project: {
+              _id: '$userInfo._id',
+              name: '$userInfo.name',
+              email: '$userInfo.email',
+              avatar: '$userInfo.avatar',
+              joinedAt: '$members.joinedAt',
+              isWorkspaceAdmin: {
+                $cond: {
+                  if: { $eq: ['$userInfo._id', '$admin'] },
+                  then: true,
+                  else: false
+                }
+              }
+            }
+          }
+        ],
+        totalCount: [{ $count: 'count' }]
       }
     }
   ])
-  const totalDocs = await Channel.countDocuments({ workspaceId: wId, name: regex })
-  const totalPages = Math.ceil(totalDocs / limit)
+
+  const users = result[0].users
+  const count = result[0].totalCount[0]?.count ?? 0
+  const totalPages = Math.ceil(count / limit)
+
   return {
-    channels,
+    users,
     currentPage: page,
-    totalPages: totalPages
+    totalPages
   }
 }
-export { getAllChannelsService, updateChannelService, deleteChannelService, searchChannelsService }
+
+const deleteUserInWorkspaceService = async (workspaceId: string, userId: string) => {
+  const wId = convertToObjectId(workspaceId)
+  const uId = convertToObjectId(userId)
+  const session = await User.startSession()
+  try {
+    await session.withTransaction(async () => {
+      const checkUserInWorkspace = await workspaceRepo.checkUserAlreadyInWorkspace(wId, uId)
+      if (!checkUserInWorkspace) {
+        throw new Error()
+      }
+      const checkUserInInAnyChannelOfWorkspace = await channelRepo.checkUserInInAnyChannelOfWorkspace(wId, uId)
+      if (!checkUserInInAnyChannelOfWorkspace) {
+        throw new Error()
+      }
+
+      await Workspace.updateOne({ _id: wId }, { $pull: { members: { user: uId } } }).session(session)
+      await Channel.updateMany({ workspaceId: wId }, { $pull: { members: { user: uId } } }).session(session)
+    })
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    throw new ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, ERROR_MESSAGES.DELETE_USER_FROM_WORKSPACE)
+  } finally {
+    session.endSession()
+  }
+}
+export {
+  getAllChannelsService,
+  updateChannelService,
+  deleteChannelService,
+  getAllUserInWorkspaceService,
+  deleteUserInWorkspaceService
+}

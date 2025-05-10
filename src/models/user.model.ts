@@ -77,5 +77,6 @@ const UserSchema = new Schema<IUser>(
 )
 
 const User = mongoose.model<IUser>(DOCUMENT_NAME, UserSchema)
+UserSchema.index({ email: 1 }, { unique: true })
 UserSchema.index({ name: 'text', email: 'text' })
 export { User, IUser }

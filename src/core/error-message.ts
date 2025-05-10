@@ -43,6 +43,8 @@ const ERROR_MESSAGES = {
   CAN_NOT_UNBLOCK_YOURSELF: 'You can not unlock yourself.',
   INVALID_ROLE: 'Invalid role',
   DELETE_WORKSPACE_FAIL: 'Delete workspace failed, please try again later.',
+  // workspace_admin
+  DELETE_USER_FROM_WORKSPACE: 'Delete from workspace user failed, please try again later.',
   UPDATE_CHANNEL_FAILED: 'Update channel failed, please try again later.',
   NAME_CHANNEL_EXISTED: 'Channel name already existed, please choose another name.',
   DELETE_CHANNEL_FAILED: 'Delete channel failed, please try again later.'
