@@ -22,7 +22,9 @@ const role_permissions = [
       'delete_channel',
       'read_channels',
       'update_channel',
-      'invite_member_to_workspace'
+      'invite_member_to_workspace',
+      'read_users_in_workspace',
+      'delete_user_in_workspace'
     ],
     inherits: [ROLES.CHANNEL_ADMIN]
   },
@@ -63,8 +65,11 @@ const handleWorkspaceAdminPermission = async (action: string, workspaceId: strin
   if (!WORKSPACE_ADMIN_PERMS.has(action)) return
   const cId = convertToObjectId(workspaceId)
   const isWorkspaceAdmin = await workspaceRepo.checkUserIsAdminOfWorkspace(cId, userId)
+  // print workspaceId and userId
+  console.log('workspaceId:', workspaceId)
+  console.log('userId:', userId)
   if (!isWorkspaceAdmin) {
-    throw new ErrorResponse(StatusCodes.FORBIDDEN, ReasonPhrases.FORBIDDEN)
+    throw new ErrorResponse(StatusCodes.FORBIDDEN, 'sss')
   }
 }
 

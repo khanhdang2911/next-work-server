@@ -8,7 +8,8 @@ const getAllChannels = async (req: Request, res: Response) => {
   const { workspaceId } = req.params
   const limit = Number(req.query.limit) || 10
   const page = Number(req.query.page) || 1
-  const channels = await workspaceAdminService.getAllChannelsService(workspaceId, limit, page)
+  const query = req.query.query as string
+  const channels = await workspaceAdminService.getAllChannelsService(workspaceId, limit, page, query)
   new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, channels).send(res)
 }
 
@@ -25,12 +26,18 @@ const deleteChannel = async (req: Request, res: Response) => {
   new SuccessResponse(StatusCodes.OK, SUCCESS_MESSAGES.DELETE_CHANNEL_SUCCESS).send(res)
 }
 
-const searchChannels = async (req: Request, res: Response) => {
+const getAllUserInWorkspace = async (req: Request, res: Response) => {
   const { workspaceId } = req.params
-  const query = req.params.query
   const limit = Number(req.query.limit) || 10
   const page = Number(req.query.page) || 1
-  const channels = await workspaceAdminService.searchChannelsService(workspaceId, query, limit, page)
-  new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, channels).send(res)
+  const query = req.query.query as string
+  const users = await workspaceAdminService.getAllUserInWorkspaceService(workspaceId, limit, page, query)
+  new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, users).send(res)
 }
-export { getAllChannels, updateChannel, deleteChannel, searchChannels }
+
+const deleteUserInWorkspace = async (req: Request, res: Response) => {
+  const { workspaceId, userId } = req.params
+  await workspaceAdminService.deleteUserInWorkspaceService(workspaceId, userId)
+  new SuccessResponse(StatusCodes.OK, SUCCESS_MESSAGES.DELETE_USER_FROM_WORKSPACE_SUCCESS).send(res)
+}
+export { getAllChannels, updateChannel, deleteChannel, getAllUserInWorkspace, deleteUserInWorkspace }

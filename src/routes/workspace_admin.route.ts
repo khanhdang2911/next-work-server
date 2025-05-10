@@ -1,5 +1,11 @@
 import { Router } from 'express'
-import { deleteChannel, getAllChannels, searchChannels, updateChannel } from '~/controllers/workspace_admin.controller'
+import {
+  deleteChannel,
+  deleteUserInWorkspace,
+  getAllChannels,
+  getAllUserInWorkspace,
+  updateChannel
+} from '~/controllers/workspace_admin.controller'
 import asyncErrorHandler from '~/helpers/async-error-handler'
 import authMiddleware from '~/middlewares/auth.middleware'
 import checkLockAccount from '~/middlewares/check-lock-account'
@@ -24,9 +30,15 @@ workspaceAdminRouter.delete(
   asyncErrorHandler(checkPermission('delete_channel')),
   asyncErrorHandler(deleteChannel)
 )
+// manage user
 workspaceAdminRouter.get(
-  '/:workspaceId/:query',
-  asyncErrorHandler(checkPermission('read_channels')),
-  asyncErrorHandler(searchChannels)
+  '/:workspaceId/users',
+  asyncErrorHandler(checkPermission('read_users_in_workspace')),
+  asyncErrorHandler(getAllUserInWorkspace)
+)
+workspaceAdminRouter.delete(
+  '/:workspaceId/users/:userId',
+  asyncErrorHandler(checkPermission('delete_user_in_workspace')),
+  asyncErrorHandler(deleteUserInWorkspace)
 )
 export default workspaceAdminRouter

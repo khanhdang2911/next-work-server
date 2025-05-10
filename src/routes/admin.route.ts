@@ -4,8 +4,6 @@ import {
   getAllUsers,
   getAllWorkspaces,
   lockUser,
-  searchUsers,
-  searchWorkspaces,
   unlockUser,
   updateUser
 } from '~/controllers/admin.controller'
@@ -23,10 +21,7 @@ adminRouter.get('/users', asyncErrorHandler(getAllUsers))
 adminRouter.put('/users/lock/:lock_userId', asyncErrorHandler(lockUser))
 adminRouter.put('/users/unlock/:unlock_userId', asyncErrorHandler(unlockUser))
 adminRouter.patch('/users/:update_userId', asyncErrorHandler(updateUser))
-adminRouter.get('/users/search/:query', asyncErrorHandler(searchUsers))
 // workspaces
 adminRouter.get('/workspaces', asyncErrorHandler(getAllWorkspaces))
 adminRouter.delete('/workspaces/:workspaceId', asyncErrorHandler(deleteWorkspace))
-adminRouter.get('/workspaces/search/:query', asyncErrorHandler(searchWorkspaces))
-adminRouter.get('/workspaces/search/:query', asyncErrorHandler(searchWorkspaces))
 export default adminRouter

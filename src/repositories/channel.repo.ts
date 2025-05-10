@@ -21,4 +21,17 @@ const checkUserIsAdminOfChannel = async (channelId: Types.ObjectId, userId: Type
     admin: userId
   }).lean()
 }
-export { checkUserAlreadyInChannel, checkChannelIsExisted, checkUserIsAdminOfChannel }
+
+const checkUserInInAnyChannelOfWorkspace = async (workspaceId: Types.ObjectId, userId: Types.ObjectId) => {
+  const checkUserInChannel = await Channel.exists({
+    workspaceId,
+    'members.user': userId
+  }).lean()
+  return checkUserInChannel
+}
+export {
+  checkUserAlreadyInChannel,
+  checkChannelIsExisted,
+  checkUserIsAdminOfChannel,
+  checkUserInInAnyChannelOfWorkspace
+}
