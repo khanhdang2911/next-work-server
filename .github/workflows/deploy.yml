@@ -40,3 +40,7 @@ jobs:
             sudo docker images | grep "${{ secrets.DOCKER_USERNAME }}/next-work-server" | grep -v "${{ needs.build.outputs.commit_sha }}" | awk '{print $3}' | xargs -r sudo docker rmi || true
             sudo docker image prune -f || true
             sudo docker run -dp 9099:8099 --name next-work-server "${{ secrets.DOCKER_USERNAME }}/next-work-server:${{ needs.build.outputs.commit_sha }}"
+            sudo docker run -dp 9098:8099 --name next-work-server-1 "${{ secrets.DOCKER_USERNAME }}/next-work-server:${{ needs.build.outputs.commit_sha }}"
+            sudo docker run -dp 9097:8099 --name next-work-server-2 "${{ secrets.DOCKER_USERNAME }}/next-work-server:${{ needs.build.outputs.commit_sha }}"
+            sudo docker run -dp 9096:8099 --name next-work-server-3 "${{ secrets.DOCKER_USERNAME }}/next-work-server:${{ needs.build.outputs.commit_sha }}"
+            sudo docker run -dp 9095:8099 --name next-work-server-4 "${{ secrets.DOCKER_USERNAME }}/next-work-server:${{ needs.build.outputs.commit_sha }}"
