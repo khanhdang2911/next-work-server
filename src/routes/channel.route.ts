@@ -23,4 +23,5 @@ channelRouter.delete(
   checkPermission('delete_channel_member'),
   asyncErrorHandler(channelController.deleteMemberFromChannel)
 )
+channelRouter.delete('/leave/:channelId', asyncErrorHandler(channelController.leaveChannel))
 export default channelRouter

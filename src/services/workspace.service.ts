@@ -12,6 +12,7 @@ import { Channel } from '~/models/channel.model'
 import randtoken from 'rand-token'
 import * as workspaceRepo from '~/repositories/workspace.repo'
 import dotenv from 'dotenv'
+import { deleteUserInWorkspaceService } from './workspace_admin.service'
 dotenv.config()
 
 const createWorkspaceService = async (data: IWorkspace, userId: string) => {
@@ -48,17 +49,17 @@ const getAllWorkspaceService = async (userId: string) => {
 }
 
 const inviteUserToWorkspaceService = async (workspaceId: string, userId: string, data: IInviteUserData) => {
-  const wsId = convertToObjectId(workspaceId)
+  const wId = convertToObjectId(workspaceId)
   const { error } = workspaceValidation.validateInviteUserToWorkspace(data)
   if (error) {
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, cleanedMessage(error.message))
   }
   const { email, channels } = data
-  const checkInvitationExisted = await Invitation.exists({ email, workspaceId: wsId }).lean()
+  const checkInvitationExisted = await Invitation.exists({ email, workspaceId: wId }).lean()
   if (checkInvitationExisted) {
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.ALREADY_SEND_INVITATION)
   }
-  const workspace = await Workspace.findById(wsId).select('name').lean()
+  const workspace = await Workspace.findById(wId).select('name').lean()
   if (!workspace) {
     throw new ErrorResponse(StatusCodes.FORBIDDEN, ERROR_MESSAGES.WORKSPACE_NOT_FOUND)
   }
@@ -66,13 +67,13 @@ const inviteUserToWorkspaceService = async (workspaceId: string, userId: string,
   if (!invitedUser) {
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_FOUND)
   }
-  const checkUserAlreadyInWorkspace = await workspaceRepo.checkUserAlreadyInWorkspace(wsId, invitedUser._id)
+  const checkUserAlreadyInWorkspace = await workspaceRepo.checkUserAlreadyInWorkspace(wId, invitedUser._id)
   if (checkUserAlreadyInWorkspace) {
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_ALREADY_IN_WORKSPACE)
   }
   if (channels && channels.length > 0) {
     const channelsObjectId = channels.map((channelId) => convertToObjectId(channelId))
-    const checkChannelsInWorkspace = await workspaceRepo.checkChannelsInWorkspace(wsId, channelsObjectId)
+    const checkChannelsInWorkspace = await workspaceRepo.checkChannelsInWorkspace(wId, channelsObjectId)
     if (!checkChannelsInWorkspace) {
       throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.CHANNEL_NOT_FOUND)
     }
@@ -92,14 +93,14 @@ const inviteUserToWorkspaceService = async (workspaceId: string, userId: string,
   await transporter.sendMail(mailOptions)
   await Invitation.create({
     email,
-    workspaceId: wsId,
+    workspaceId: wId,
     channels: channels!.map((channelId) => convertToObjectId(channelId)),
     token
   })
 }
 
 const acceptInvitationService = async (token: string, workspaceId: string) => {
-  const wsId = convertToObjectId(workspaceId)
+  const wId = convertToObjectId(workspaceId)
   const invitation = await Invitation.findOne({ token }).select('email channels').lean()
   if (!invitation) {
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.INVITATION_NOT_FOUND)
@@ -109,17 +110,17 @@ const acceptInvitationService = async (token: string, workspaceId: string) => {
   if (!user) {
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_FOUND)
   }
-  const checkWorkspaceExisted = await Workspace.exists({ _id: wsId }).lean()
+  const checkWorkspaceExisted = await Workspace.exists({ _id: wId }).lean()
   if (!checkWorkspaceExisted) {
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.WORKSPACE_NOT_FOUND)
   }
-  const checkChannelsInWorkspace = await workspaceRepo.checkChannelsInWorkspace(wsId, channels)
+  const checkChannelsInWorkspace = await workspaceRepo.checkChannelsInWorkspace(wId, channels)
   if (!checkChannelsInWorkspace) {
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.CHANNEL_NOT_FOUND)
   }
   await Workspace.updateOne(
     {
-      _id: wsId,
+      _id: wId,
       'members.user': { $ne: user._id }
     },
     {
@@ -134,7 +135,7 @@ const acceptInvitationService = async (token: string, workspaceId: string) => {
   await Channel.updateMany(
     {
       _id: { $in: channels },
-      workspaceId: wsId
+      workspaceId: wId
     },
     {
       $addToSet: {
@@ -149,22 +150,27 @@ const acceptInvitationService = async (token: string, workspaceId: string) => {
 }
 
 const getWorkspaceByIdService = async (workspaceId: string, userId: string) => {
-  const wsId = convertToObjectId(workspaceId)
+  const wId = convertToObjectId(workspaceId)
   const uId = convertToObjectId(userId)
-  const checkUserInWorkspace = await workspaceRepo.checkUserAlreadyInWorkspace(wsId, uId)
+  const checkUserInWorkspace = await workspaceRepo.checkUserAlreadyInWorkspace(wId, uId)
   if (!checkUserInWorkspace) {
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_IN_WORKSPACE)
   }
-  const workspace = await Workspace.findById(wsId).select('name description image').lean()
+  const workspace = await Workspace.findById(wId).select('name description image').lean()
   if (!workspace) {
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.WORKSPACE_NOT_FOUND)
   }
   return workspace
+}
+
+const leaveWorkspaceService = async (workspaceId: string, userId: string) => {
+  await deleteUserInWorkspaceService(workspaceId, userId)
 }
 export {
   createWorkspaceService,
   getAllWorkspaceService,
   inviteUserToWorkspaceService,
   acceptInvitationService,
-  getWorkspaceByIdService
+  getWorkspaceByIdService,
+  leaveWorkspaceService
 }

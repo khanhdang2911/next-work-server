@@ -4,7 +4,7 @@ const ERROR_MESSAGES = {
   INVALID_CREDENTIALS: 'Email or password is incorrect.',
   ACCOUNT_NOT_ACTIVATED: 'Your account is not activated, please check your email to activate account and try again',
   EMAIL_ALREADY_EXIST: 'Email is already exist.',
-  ACCOUNT_IS_BLOCKED: 'Your account is blocked, please contact admin to unlock your account.',
+  ACCOUNT_IS_BLOCKED: 'Your account is blocked.',
   UPDATE_USER_FAIL: 'Update user failed, please try again.',
   // mail
   CHECK_EMAIL: 'Please check your email to verify your account and try again...',
@@ -28,7 +28,7 @@ const ERROR_MESSAGES = {
   CONVERSATION_NOT_FOUND: 'Conversation not found.',
   USER_NOT_IN_CONVERSATION: 'User not in this conversation.',
   CONVERSATION_IS_EXISTED: 'Conversation already exists.',
-  CAN_NOT_DELETE_YOURSELF: 'You can not delete yourself from this channel.',
+  CAN_NOT_DELETE_YOURSELF: 'You is admin of this channel, you can not leave this channel.',
   // upload file
   FILE_TOO_BIG: 'File too big, limited to 40MB!',
   TOO_MANY_FILES: 'Too many files, limited to 5 files!',
@@ -44,7 +44,7 @@ const ERROR_MESSAGES = {
   INVALID_ROLE: 'Invalid role',
   DELETE_WORKSPACE_FAIL: 'Delete workspace failed, please try again later.',
   // workspace_admin
-  DELETE_USER_FROM_WORKSPACE: 'Delete from workspace user failed, please try again later.',
+  CANNOT_DELETE_YOURSELF: 'You can not leave this workspace, you are admin of this workspace.',
   UPDATE_CHANNEL_FAILED: 'Update channel failed, please try again later.',
   NAME_CHANNEL_EXISTED: 'Channel name already existed, please choose another name.',
   DELETE_CHANNEL_FAILED: 'Delete channel failed, please try again later.'

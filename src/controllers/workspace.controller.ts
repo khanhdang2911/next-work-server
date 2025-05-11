@@ -36,4 +36,11 @@ const getWorkspaceById = async (req: Request, res: Response) => {
   const workspace = await workspaceService.getWorkspaceByIdService(workspaceId, userId)
   new SuccessResponse(StatusCodes.OK, ReasonPhrases.OK, workspace).send(res)
 }
-export { createWorkspace, getAllWorkspace, inviteUserToWorkspace, acceptInvitation, getWorkspaceById }
+
+const leaveWorkspace = async (req: Request, res: Response) => {
+  const userId = req.userId
+  const { workspaceId } = req.params
+  await workspaceService.leaveWorkspaceService(workspaceId, userId)
+  new SuccessResponse(StatusCodes.OK, SUCCESS_MESSAGES.LEAVE_WORKSPACE_SUCCESS).send(res)
+}
+export { createWorkspace, getAllWorkspace, inviteUserToWorkspace, acceptInvitation, getWorkspaceById, leaveWorkspace }
