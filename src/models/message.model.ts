@@ -22,6 +22,7 @@ interface IMessage {
   conversationId: Types.ObjectId
   reactions?: IReaction[]
   attachments?: IAttachment[]
+  isEdited?: boolean
 }
 
 // Subdocument Schema
@@ -58,7 +59,8 @@ const MessageSchema = new Schema<IMessage>(
       required: true
     },
     reactions: [ReactionSchema],
-    attachments: [AttachmentSchema]
+    attachments: [AttachmentSchema],
+    isEdited: { type: Boolean, default: false }
   },
   {
     timestamps: true,

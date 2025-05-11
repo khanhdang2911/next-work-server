@@ -119,7 +119,10 @@ const updateMessageService = async (userId: string, messageId: string, data: Mes
       _id: mId,
       senderId: uId
     },
-    data,
+    {
+      ...data,
+      isEdited: true
+    },
     { new: true }
   )
   if (!message) {

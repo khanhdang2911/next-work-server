@@ -83,7 +83,7 @@ const inviteUserToWorkspaceService = async (workspaceId: string, userId: string,
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_FOUND)
   }
   const token = randtoken.generate(Number(process.env.OTP_TOKEN_SIZE) || 64)
-  const invitationLink = `${process.env.FE_URL}/workspace/${workspaceId}/accept-invitation/${token}`
+  const invitationLink = `${process.env.FE_URL_MAIN}/workspace/${workspaceId}/accept-invitation/${token}`
   const mailOptions = {
     from: process.env.MAIL_FROM,
     to: email,
