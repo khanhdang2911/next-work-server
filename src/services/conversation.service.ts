@@ -17,7 +17,7 @@ const createConversation = async (userId: string, data: ConversationDTO) => {
   }
 
   const { type, channelId, workspaceId, participants } = data
-  const convertedWorkspaceId = convertToObjectId(workspaceId)
+  const convertedWorkspaceId = convertToObjectId(workspaceId!)
   const convertedChannelId = channelId ? convertToObjectId(channelId) : undefined
   const convertedParticipants = participants?.map((id) => convertToObjectId(id))
   // check conversation is existed
@@ -39,7 +39,9 @@ const createConversation = async (userId: string, data: ConversationDTO) => {
   }
 
   if (checkConversationIsExisted) {
-    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.CONVERSATION_IS_EXISTED)
+    return {
+      conversationId: checkConversationIsExisted._id
+    }
   }
   // check participants is existed
   if (type === CONVERSATION_TYPE.CHANNEL) {

@@ -28,7 +28,7 @@ const searchUserService = async (query: string, channelId: string, userId: strin
 const getUserByIdService = async (id: string) => {
   const user = await User.findById(id).select('name email avatar status gender').lean()
   if (!user) {
-    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_FOUND)
+    throw new ErrorResponse(StatusCodes.NOT_FOUND, ERROR_MESSAGES.USER_NOT_FOUND)
   }
   return user
 }
