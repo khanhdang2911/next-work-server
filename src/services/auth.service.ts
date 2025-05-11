@@ -46,7 +46,8 @@ const loginService = async (email: string, password: string) => {
   const accessToken = generateToken({
     id: user._id,
     email: user.email,
-    name: user.name
+    name: user.name,
+    roles: user.roles
   })
   const refreshToken = randtoken.generate(Number(process.env.JWT_REFRESH_TOKEN_SIZE) || 64)
   user.refreshToken = refreshToken
@@ -103,7 +104,8 @@ const loginWithAuth0Service = async (user: any) => {
   const accessToken = generateToken({
     id: userInDb._id,
     email: userInDb.email,
-    name: userInDb.name
+    name: userInDb.name,
+    roles: userInDb.roles
   })
   const refreshToken = randtoken.generate(Number(process.env.JWT_REFRESH_TOKEN_SIZE) || 64)
   userInDb.refreshToken = refreshToken

@@ -13,11 +13,10 @@ workspaceRouter.use(asyncErrorHandler(checkLockAccount))
 workspaceRouter.post('/', asyncErrorHandler(workspaceController.createWorkspace))
 workspaceRouter.get('/', asyncErrorHandler(workspaceController.getAllWorkspace))
 workspaceRouter.get('/:workspaceId', asyncErrorHandler(workspaceController.getWorkspaceById))
-// workspaceRouter.put('/:workspaceId', asyncErrorHandler(updateWorkspace))
-// workspaceRouter.delete('/:workspaceId', asyncErrorHandler(deleteWorkspace))
 workspaceRouter.post(
   '/:workspaceId/invite',
   checkPermission('invite_member_to_workspace'),
   asyncErrorHandler(workspaceController.inviteUserToWorkspace)
 )
+workspaceRouter.delete('/leave/:workspaceId', asyncErrorHandler(workspaceController.leaveWorkspace))
 export default workspaceRouter

@@ -10,7 +10,6 @@ import { Workspace } from '~/models/workspace.model'
 import { cleanedMessage, convertToObjectId } from '~/utils/common'
 import { validateCreateChannel } from '~/validations/channel.validation'
 import * as workspaceRepo from '~/repositories/workspace.repo'
-import * as channelRepo from '~/repositories/channel.repo'
 
 const getAllChannelsService = async (workspaceId: string, limit: number, page: number, query: string = '') => {
   const queryRegex = new RegExp(query, 'i')
@@ -182,21 +181,17 @@ const deleteUserInWorkspaceService = async (workspaceId: string, userId: string)
   const session = await User.startSession()
   try {
     await session.withTransaction(async () => {
+      const checkUserIsAdminWorkspace = await workspaceRepo.checkUserIsAdminOfWorkspace(wId, uId)
+      if (checkUserIsAdminWorkspace) {
+        throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.CANNOT_DELETE_YOURSELF)
+      }
       const checkUserInWorkspace = await workspaceRepo.checkUserAlreadyInWorkspace(wId, uId)
       if (!checkUserInWorkspace) {
-        throw new Error()
+        throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_IN_WORKSPACE)
       }
-      const checkUserInInAnyChannelOfWorkspace = await channelRepo.checkUserInInAnyChannelOfWorkspace(wId, uId)
-      if (!checkUserInInAnyChannelOfWorkspace) {
-        throw new Error()
-      }
-
       await Workspace.updateOne({ _id: wId }, { $pull: { members: { user: uId } } }).session(session)
       await Channel.updateMany({ workspaceId: wId }, { $pull: { members: { user: uId } } }).session(session)
     })
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (error) {
-    throw new ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, ERROR_MESSAGES.DELETE_USER_FROM_WORKSPACE)
   } finally {
     session.endSession()
   }
