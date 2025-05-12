@@ -40,7 +40,7 @@ const loginService = async (email: string, password: string) => {
   if (!validPassword) throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.INVALID_CREDENTIALS)
   if (user.isLocked) throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.ACCOUNT_IS_BLOCKED)
   if (!user.isActivated) {
-    await sendMailVerification(email)
+    sendMailVerification(email)
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.ACCOUNT_NOT_ACTIVATED)
   }
   const accessToken = generateToken({
@@ -93,14 +93,13 @@ const generateRefreshTokenService = async (refreshToken: string, userId: string)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const loginWithAuth0Service = async (user: any) => {
   let userInDb = await User.findOne({ email: user.email })
-  if (!userInDb) {
-    userInDb = await User.create({
-      email: user.email,
-      name: user.name,
-      avatar: user.picture,
-      auth0Id: user.sub
-    })
-  }
+  userInDb ??= await User.create({
+    email: user.email,
+    name: user.name,
+    avatar: user.picture,
+    auth0Id: user.sub,
+    isActivated: true
+  })
   const accessToken = generateToken({
     id: userInDb._id,
     email: userInDb.email,

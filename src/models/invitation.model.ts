@@ -7,6 +7,7 @@ interface IInvitation {
   workspaceId: Types.ObjectId
   channels: [Types.ObjectId]
   token: string
+  expiresAt?: Date
 }
 
 const InvitationSchema = new Schema<IInvitation>(
@@ -29,6 +30,11 @@ const InvitationSchema = new Schema<IInvitation>(
     token: {
       type: String,
       required: true
+    },
+    expiresAt: {
+      type: Date,
+      default: () => new Date(Date.now() + 50 * 60 * 1000),
+      index: { expires: 0 }
     }
   },
   {
