@@ -100,6 +100,7 @@ const loginWithAuth0Service = async (user: any) => {
     auth0Id: user.sub,
     isActivated: true
   })
+  if (userInDb.isLocked) throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.ACCOUNT_IS_BLOCKED)
   const accessToken = generateToken({
     id: userInDb._id,
     email: userInDb.email,
