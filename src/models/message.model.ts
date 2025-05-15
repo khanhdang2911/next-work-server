@@ -18,11 +18,12 @@ interface IAttachment {
 
 interface IMessage {
   content: string
-  senderId: Types.ObjectId
+  senderId?: Types.ObjectId
   conversationId: Types.ObjectId
   reactions?: IReaction[]
   attachments?: IAttachment[]
   isEdited?: boolean
+  isChatbot?: boolean
 }
 
 // Subdocument Schema
@@ -51,7 +52,7 @@ const MessageSchema = new Schema<IMessage>(
     content: { type: String, required: true },
     senderId: {
       type: Schema.Types.ObjectId,
-      required: true,
+      required: false,
       ref: 'user'
     },
     conversationId: {
@@ -60,7 +61,8 @@ const MessageSchema = new Schema<IMessage>(
     },
     reactions: [ReactionSchema],
     attachments: [AttachmentSchema],
-    isEdited: { type: Boolean, default: false }
+    isEdited: { type: Boolean, default: false },
+    isChatbot: { type: Boolean, default: false }
   },
   {
     timestamps: true,

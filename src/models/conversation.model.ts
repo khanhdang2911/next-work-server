@@ -8,6 +8,7 @@ interface IConversation {
   channelId?: Types.ObjectId
   workspaceId?: Types.ObjectId
   participants: Types.ObjectId[]
+  isChatbot?: boolean
 }
 
 const ConversationSchema = new Schema<IConversation>(
@@ -28,7 +29,7 @@ const ConversationSchema = new Schema<IConversation>(
       type: Schema.Types.ObjectId,
       ref: 'workspace',
       required: function (this: IConversation) {
-        return this.type === CONVERSATION_TYPE.DIRECT
+        return this.type === CONVERSATION_TYPE.DIRECT || this.type === CONVERSATION_TYPE.CHATBOT
       }
     },
     participants: [
@@ -39,7 +40,12 @@ const ConversationSchema = new Schema<IConversation>(
           return this.type !== CONVERSATION_TYPE.CHANNEL
         }
       }
-    ]
+    ],
+    isChatbot: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
   },
   {
     timestamps: true,

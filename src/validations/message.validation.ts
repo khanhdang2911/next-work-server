@@ -17,7 +17,13 @@ const validateCreateMessage = (data: object) => {
   })
   return schema.validate(data)
 }
-
+const validateCreateChatbotMessage = (data: object) => {
+  const schema = Joi.object({
+    content: Joi.string().required(),
+    conversationId: Joi.string().required()
+  })
+  return schema.validate(data)
+}
 const validateUpdateMessage = (data: object) => {
   const schema = Joi.object({
     content: Joi.string()
@@ -38,4 +44,4 @@ const validateReactMessage = (data: object) => {
   })
   return schema.validate(data)
 }
-export { validateCreateMessage, validateUpdateMessage, validateReactMessage }
+export { validateCreateMessage, validateUpdateMessage, validateReactMessage, validateCreateChatbotMessage }

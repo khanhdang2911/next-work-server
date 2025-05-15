@@ -6,6 +6,7 @@ import workspaceRouter from './workspace.route'
 import channelRouter from './channel.route'
 import conversationRouter from './conversation.route'
 import adminRouter from './admin.route'
+import chatbotRouter from './chatbot.route'
 import { Router } from 'express'
 import messageRouter from './message.route'
 import workspaceAdminRouter from './workspace_admin.route'
@@ -21,6 +22,7 @@ router.use('/messages', messageRouter)
 router.use('/conversations', conversationRouter)
 router.use('/admin', adminRouter)
 router.use('/workspace/admin', workspaceAdminRouter)
+router.use('/chatbot', chatbotRouter)
 router.use('/', (req, res) => {
   res.send('Hello World!')
 })

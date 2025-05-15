@@ -14,7 +14,8 @@ enum GENDER {
 
 enum CONVERSATION_TYPE {
   CHANNEL = 'channel',
-  DIRECT = 'direct'
+  DIRECT = 'direct',
+  CHATBOT = 'chatbot'
 }
 
 enum USER_STATUS {
