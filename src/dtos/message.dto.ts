@@ -1,6 +1,6 @@
 interface MessageDTO {
   content: string
-  senderId: string
+  senderId?: string
   conversationId: string
   reactions?: {
     emoji: string

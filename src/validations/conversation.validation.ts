@@ -7,7 +7,7 @@ const createConversationValidation = (data: object) => {
       .valid(...Object.values(CONVERSATION_TYPE))
       .required(),
     channelId: Joi.string().when('type', {
-      is: CONVERSATION_TYPE.DIRECT,
+      is: CONVERSATION_TYPE.CHATBOT || CONVERSATION_TYPE.DIRECT,
       then: Joi.optional(),
       otherwise: Joi.required()
     }),
@@ -17,13 +17,11 @@ const createConversationValidation = (data: object) => {
       otherwise: Joi.required()
     }),
     participants: Joi.array()
-      .optional()
       .items(Joi.string())
-      .custom((value, helpers) => {
-        if (value.length === 2) {
-          return value
-        }
-        return helpers.error('any.invalid')
+      .when('type', {
+        is: CONVERSATION_TYPE.CHATBOT,
+        then: Joi.array().items(Joi.string()).length(1).required(),
+        otherwise: Joi.array().items(Joi.string()).length(2).required()
       })
   })
   return schema.validate(data)

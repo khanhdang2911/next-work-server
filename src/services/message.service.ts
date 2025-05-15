@@ -9,6 +9,8 @@ import { CONVERSATION_TYPE } from '~/constants/common.constant'
 import * as channelRepo from '~/repositories/channel.repo'
 import { MessageDTO, ReactMessageDTO } from '~/dtos/message.dto'
 import { deleteFileFromAzure, uploadFileToAzure } from '~/configs/azure.init'
+import { ChatBotGenerateText } from '~/configs/gemini.init'
+import { getMessagesByConversationId } from '~/repositories/message.repo'
 const createMessageService = async (userId: string, data: MessageDTO, files: Express.Multer.File[]) => {
   const { error } = messageValidation.validateCreateMessage(data)
   if (error) {
@@ -34,21 +36,47 @@ const createMessageService = async (userId: string, data: MessageDTO, files: Exp
   //upload file --> azure
   const fileInfos: IAttachment[] = []
 
-  for (const file of files) {
-    const sasToken = await uploadFileToAzure(file)
+  if (files && files.length > 0) {
+    for (const file of files) {
+      const sasToken = await uploadFileToAzure(file)
 
-    fileInfos.push({
-      name: file.originalname,
-      type: file.mimetype,
-      size: Math.round((file.size / (1024 * 1024)) * 100) / 100,
-      url: sasToken
-    })
+      fileInfos.push({
+        name: file.originalname,
+        type: file.mimetype,
+        size: Math.round((file.size / (1024 * 1024)) * 100) / 100,
+        url: sasToken
+      })
+    }
   }
 
   const message = await Message.create({
     ...data,
     attachments: fileInfos,
     senderId: uId
+  })
+  return message
+}
+
+const createChatbotMessageService = async (data: MessageDTO, userId: string) => {
+  const { error } = messageValidation.validateCreateChatbotMessage(data)
+  if (error) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, cleanedMessage(error.message))
+  }
+  const { conversationId, content } = data
+  const cId = convertToObjectId(conversationId)
+  const conversation = await Conversation.findById(conversationId).select('type participants').lean()
+  if (
+    !conversation ||
+    conversation.type !== CONVERSATION_TYPE.CHATBOT ||
+    conversation.participants[0].toString() !== userId
+  ) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.CONVERSATION_NOT_FOUND)
+  }
+  const response = await ChatBotGenerateText(cId, content)
+  const message = await Message.create({
+    ...data,
+    content: response,
+    isChatbot: true
   })
   return message
 }
@@ -71,15 +99,7 @@ const getMessagesService = async (userId: string, conversationId: string, page: 
       throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_IN_CONVERSATION)
     }
   }
-  const messages = await Message.find({
-    conversationId: cId
-  })
-    .populate('senderId', 'name avatar')
-    .sort({ createdAt: -1 })
-    .skip((page - 1) * limit)
-    .limit(limit)
-    .sort({ createdAt: 1 })
-    .lean()
+  const messages = getMessagesByConversationId(cId, page, limit)
   return messages
 }
 const deleteMessageService = async (userId: string, messageId: string) => {
@@ -185,4 +205,11 @@ const reactMessageService = async (userId: string, messageId: string, data: Reac
     }
   )
 }
-export { createMessageService, getMessagesService, deleteMessageService, updateMessageService, reactMessageService }
+export {
+  createMessageService,
+  getMessagesService,
+  deleteMessageService,
+  updateMessageService,
+  reactMessageService,
+  createChatbotMessageService
+}

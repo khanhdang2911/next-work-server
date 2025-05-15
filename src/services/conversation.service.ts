@@ -30,10 +30,10 @@ const createConversation = async (userId: string, data: ConversationDTO) => {
     })
   } else {
     checkConversationIsExisted = await Conversation.exists({
+      workspaceId: convertedWorkspaceId,
       type,
       participants: {
-        $all: convertedParticipants,
-        $size: 2
+        $all: convertedParticipants
       }
     })
   }
@@ -51,9 +51,11 @@ const createConversation = async (userId: string, data: ConversationDTO) => {
     }
   } else {
     const users = await User.find({ _id: { $in: convertedParticipants } })
+      .select('_id')
+      .lean()
     const participantsSet = new Set(participants)
 
-    if (users.length !== 2 || !participantsSet.has(userId)) {
+    if (users.length !== participants?.length || !participantsSet.has(userId)) {
       // user not found
       throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.CANNOT_CREATE_CONVERSATION)
     }
@@ -67,8 +69,8 @@ const createConversation = async (userId: string, data: ConversationDTO) => {
   }
   const conversation = await Conversation.create({
     type,
-    channelId: convertedChannelId,
-    workspaceId: type === CONVERSATION_TYPE.DIRECT ? convertedWorkspaceId : undefined,
+    channelId: type === CONVERSATION_TYPE.CHANNEL ? convertedChannelId : undefined,
+    workspaceId: type === CONVERSATION_TYPE.DIRECT || CONVERSATION_TYPE.CHATBOT ? convertedWorkspaceId : undefined,
     participants: type === CONVERSATION_TYPE.CHANNEL ? [] : convertedParticipants
   })
 
