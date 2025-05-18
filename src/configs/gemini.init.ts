@@ -4,8 +4,7 @@ import { Types } from 'mongoose'
 import { getMessagesByConversationId } from '~/repositories/message.repo'
 dotenv.config()
 const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-  location: 'us-central1'
+  apiKey: process.env.GEMINI_API_KEY
 })
 const config = {
   responseMimeType: 'text/plain',
