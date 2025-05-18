@@ -9,10 +9,10 @@ const handleNotFound = (req: Request, res: Response, next: NextFunction) => {
 }
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const handleError = (err: ErrorResponse, req: Request, res: Response, next: NextFunction): void => {
-  // err =
-  //   err instanceof ErrorResponse
-  //     ? err
-  //     : new ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, ReasonPhrases.INTERNAL_SERVER_ERROR, req)
+  err =
+    err instanceof ErrorResponse
+      ? err
+      : new ErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, ReasonPhrases.INTERNAL_SERVER_ERROR, req)
   const statusCode = err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR
   const errorMessage = err.message || ReasonPhrases.INTERNAL_SERVER_ERROR
   res.status(statusCode).json({
