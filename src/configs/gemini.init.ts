@@ -60,7 +60,7 @@ async function ChatBotGenerateText(conversationId: Types.ObjectId, content: stri
       ]
     }
   ])
-  const retriesMax = 3
+  const retriesMax = 7
   let retry = 0
   let response
   while (retry < retriesMax) {
