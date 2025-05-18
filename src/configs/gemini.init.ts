@@ -60,7 +60,27 @@ async function ChatBotGenerateText(conversationId: Types.ObjectId, content: stri
       ]
     }
   ])
-  const response = await ai.models.generateContent({ model, config, contents })
+  const retriesMax = 3
+  let retry = 0
+  let response
+  while (retry < retriesMax) {
+    try {
+      response = await ai.models.generateContent({ model, config, contents })
+      if (response) {
+        break
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      retry++
+      if (retry === retriesMax) {
+        throw new Error()
+      }
+    }
+  }
+
+  if (!response || typeof response.text !== 'string') {
+    throw new Error('Failed to get a valid response from Gemini API')
+  }
   return response.text
 }
 
