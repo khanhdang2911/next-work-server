@@ -9,7 +9,7 @@ import { CONVERSATION_TYPE } from '~/constants/common.constant'
 import * as channelRepo from '~/repositories/channel.repo'
 import { MessageDTO, ReactMessageDTO } from '~/dtos/message.dto'
 import { deleteFileFromAzure, uploadFileToAzure } from '~/configs/azure.init'
-import { ChatBotGenerateText } from '~/configs/gemini.init'
+import { ChatBotGenerateText } from '~/configs/chatbot.init'
 import { getMessagesByConversationId } from '~/repositories/message.repo'
 const createMessageService = async (userId: string, data: MessageDTO, files: Express.Multer.File[]) => {
   const { error } = messageValidation.validateCreateMessage(data)
