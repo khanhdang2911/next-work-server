@@ -40,4 +40,19 @@ const deleteUserInWorkspace = async (req: Request, res: Response) => {
   await workspaceAdminService.deleteUserInWorkspaceService(workspaceId, userId)
   new SuccessResponse(StatusCodes.OK, SUCCESS_MESSAGES.DELETE_USER_FROM_WORKSPACE_SUCCESS).send(res)
 }
-export { getAllChannels, updateChannel, deleteChannel, getAllUserInWorkspace, deleteUserInWorkspace }
+
+const updateRoleOfUserInWorkspace = async (req: Request, res: Response) => {
+  const { workspaceId } = req.params
+  const userId = req.userId
+  const { memberId, role } = req.body
+  await workspaceAdminService.updateRoleOfUserInWorkspaceService(workspaceId, userId, memberId, role)
+  new SuccessResponse(StatusCodes.OK, SUCCESS_MESSAGES.UPDATE_USER_ROLE_SUCCESS).send(res)
+}
+export {
+  getAllChannels,
+  updateChannel,
+  deleteChannel,
+  getAllUserInWorkspace,
+  deleteUserInWorkspace,
+  updateRoleOfUserInWorkspace
+}

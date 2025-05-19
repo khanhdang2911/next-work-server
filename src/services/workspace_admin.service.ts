@@ -150,11 +150,7 @@ const getAllUserInWorkspaceService = async (workspaceId: string, limit: number, 
               avatar: '$userInfo.avatar',
               joinedAt: '$members.joinedAt',
               isWorkspaceAdmin: {
-                $cond: {
-                  if: { $eq: ['$userInfo._id', '$admin'] },
-                  then: true,
-                  else: false
-                }
+                $in: ['$userInfo._id', '$admin']
               }
             }
           }
@@ -196,10 +192,36 @@ const deleteUserInWorkspaceService = async (workspaceId: string, userId: string)
     session.endSession()
   }
 }
+
+const updateRoleOfUserInWorkspaceService = async (
+  workspaceId: string,
+  userId: string,
+  memberId: string,
+  role: string
+) => {
+  if (userId === memberId) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.CANNOT_UPDATE_YOURSELF)
+  }
+  const wId = convertToObjectId(workspaceId)
+  const mId = convertToObjectId(memberId)
+  const checkUserInWorkspace = await workspaceRepo.checkUserAlreadyInWorkspace(wId, mId)
+  if (!checkUserInWorkspace) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_IN_WORKSPACE)
+  }
+  if (role === 'admin') {
+    await Workspace.updateOne({ _id: wId }, { $addToSet: { admin: mId } })
+  } else if (role === 'member') {
+    await Workspace.updateOne({ _id: wId }, { $pull: { admin: mId } })
+  } else {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.INVALID_ROLE)
+  }
+}
+
 export {
   getAllChannelsService,
   updateChannelService,
   deleteChannelService,
   getAllUserInWorkspaceService,
-  deleteUserInWorkspaceService
+  deleteUserInWorkspaceService,
+  updateRoleOfUserInWorkspaceService
 }

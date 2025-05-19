@@ -47,4 +47,20 @@ const leaveChannel = async (req: Request, res: Response) => {
   await channelService.leaveChannelService(userId, channelId)
   new SuccessResponse(StatusCodes.OK, SUCCESS_MESSAGES.LEAVE_CHANNEL_SUCCESS).send(res)
 }
-export { createChannel, inviteUserToChannel, getChannels, getChannelMembers, deleteMemberFromChannel, leaveChannel }
+
+const updateRoleOfMemberInChannel = async (req: Request, res: Response) => {
+  const { channelId } = req.params
+  const { memberId, role } = req.body
+  const userId = req.userId
+  await channelService.updateRoleOfMemberInChannelService(userId, channelId, memberId, role)
+  new SuccessResponse(StatusCodes.OK, SUCCESS_MESSAGES.UPDATE_USER_ROLE_SUCCESS).send(res)
+}
+export {
+  createChannel,
+  inviteUserToChannel,
+  getChannels,
+  getChannelMembers,
+  deleteMemberFromChannel,
+  leaveChannel,
+  updateRoleOfMemberInChannel
+}

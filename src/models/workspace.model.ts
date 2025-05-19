@@ -10,7 +10,7 @@ interface IWorkspace {
   name: string
   image?: string
   description?: string
-  admin: Types.ObjectId
+  admin: Types.ObjectId[]
   members?: IWorkspaceMember[]
 }
 interface IInviteUserData {
@@ -49,7 +49,7 @@ const WorkspaceSchema = new Schema<IWorkspace>(
       required: false
     },
     admin: {
-      type: Schema.Types.ObjectId,
+      type: [Schema.Types.ObjectId],
       required: true,
       ref: 'user'
     },

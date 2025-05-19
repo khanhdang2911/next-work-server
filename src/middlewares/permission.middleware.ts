@@ -12,7 +12,7 @@ import { Types } from 'mongoose'
 const role_permissions = [
   {
     name: ROLES.CHANNEL_ADMIN,
-    permissions: ['invite_member_to_channel', 'delete_channel_member']
+    permissions: ['invite_member_to_channel', 'delete_channel_member', 'update_channel_role_member']
   },
   {
     name: ROLES.WORKSPACE_ADMIN,
@@ -24,7 +24,8 @@ const role_permissions = [
       'update_channel',
       'invite_member_to_workspace',
       'read_users_in_workspace',
-      'delete_user_in_workspace'
+      'delete_user_in_workspace',
+      'update_user_in_workspace'
     ],
     inherits: [ROLES.CHANNEL_ADMIN]
   },
@@ -63,13 +64,10 @@ const handleChannelAdminPermission = async (action: string, channelId: string, u
 }
 const handleWorkspaceAdminPermission = async (action: string, workspaceId: string, userId: Types.ObjectId) => {
   if (!WORKSPACE_ADMIN_PERMS.has(action)) return
-  const cId = convertToObjectId(workspaceId)
-  const isWorkspaceAdmin = await workspaceRepo.checkUserIsAdminOfWorkspace(cId, userId)
-  // print workspaceId and userId
-  console.log('workspaceId:', workspaceId)
-  console.log('userId:', userId)
+  const wId = convertToObjectId(workspaceId)
+  const isWorkspaceAdmin = await workspaceRepo.checkUserIsAdminOfWorkspace(wId, userId)
   if (!isWorkspaceAdmin) {
-    throw new ErrorResponse(StatusCodes.FORBIDDEN, 'sss')
+    throw new ErrorResponse(StatusCodes.FORBIDDEN, ReasonPhrases.FORBIDDEN)
   }
 }
 
@@ -88,11 +86,11 @@ const checkPermission = (action: string) => {
         throw new ErrorResponse(StatusCodes.FORBIDDEN, ReasonPhrases.FORBIDDEN)
       }
 
-      if (CHANNEL_ADMIN_PERMS.has(action)) {
+      if (CHANNEL_ADMIN_PERMS.has(action) && req.params.channelId) {
         await handleChannelAdminPermission(action, req.params.channelId, userId)
       }
 
-      if (WORKSPACE_ADMIN_PERMS.has(action)) {
+      if (WORKSPACE_ADMIN_PERMS.has(action) && req.params.workspaceId) {
         await handleWorkspaceAdminPermission(action, req.params.workspaceId, userId)
       }
       next()

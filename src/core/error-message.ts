@@ -47,6 +47,7 @@ const ERROR_MESSAGES = {
   CANNOT_DELETE_YOURSELF: 'You can not leave this workspace, you are admin of this workspace.',
   UPDATE_CHANNEL_FAILED: 'Update channel failed, please try again later.',
   NAME_CHANNEL_EXISTED: 'Channel name already existed, please choose another name.',
-  DELETE_CHANNEL_FAILED: 'Delete channel failed, please try again later.'
+  DELETE_CHANNEL_FAILED: 'Delete channel failed, please try again later.',
+  CANNOT_UPDATE_YOURSELF: 'You can not update yourself.'
 }
 export default ERROR_MESSAGES

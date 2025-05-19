@@ -2,7 +2,7 @@ import Joi from 'joi'
 const validateCreateChannel = (data: object) => {
   const schema = Joi.object({
     name: Joi.string().min(2).max(30).required(),
-    description: Joi.string().optional()
+    description: Joi.string().max(300).allow(null, '').optional()
   })
   return schema.validate(data)
 }

@@ -20,20 +20,21 @@ const createWorkspaceService = async (data: IWorkspace, userId: string) => {
   if (error) {
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, cleanedMessage(error.message))
   }
+  const uId = convertToObjectId(userId)
   const checkWorkspaceExisted = await Workspace.exists({
     name: data.name,
-    admin: convertToObjectId(userId)
+    admin: uId
   }).lean()
   if (checkWorkspaceExisted) {
     throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.WORKSPACE_EXISTED)
   }
   const firstMember: IWorkspaceMember = {
-    user: convertToObjectId(userId),
+    user: uId,
     joinedAt: new Date()
   }
   const workspace = await Workspace.create({
     ...data,
-    admin: userId,
+    admin: [uId],
     members: [firstMember]
   })
   return workspace

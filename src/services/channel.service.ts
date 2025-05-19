@@ -170,11 +170,7 @@ const getChannelMembersService = async (userId: string, channelId: string) => {
         status: '$userInfo.status',
         joinedAt: '$members.joinedAt',
         admin: {
-          $cond: {
-            if: { $eq: ['$userInfo._id', '$admin'] },
-            then: true,
-            else: false
-          }
+          $in: ['$userInfo._id', '$admin']
         }
       }
     }
@@ -210,11 +206,37 @@ const deleteMemberFromChannelService = async (userId: string, channelId: string,
 const leaveChannelService = async (userId: string, channelId: string) => {
   await removeUserFromChannel(channelId, userId)
 }
+
+const updateRoleOfMemberInChannelService = async (
+  userId: string,
+  channelId: string,
+  memberId: string,
+  role: string
+) => {
+  if (userId === memberId) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.CANNOT_UPDATE_YOURSELF)
+  }
+  const cId = convertToObjectId(channelId)
+  const uId = convertToObjectId(userId)
+  const mId = convertToObjectId(memberId)
+  const checkUserInChannel = await channelRepo.checkUserAlreadyInChannel(cId, uId)
+  if (!checkUserInChannel) {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.USER_NOT_IN_CHANNEL)
+  }
+  if (role === 'admin') {
+    await Channel.updateOne({ _id: cId }, { $addToSet: { admin: mId } })
+  } else if (role === 'member') {
+    await Channel.updateOne({ _id: cId }, { $pull: { admin: mId } })
+  } else {
+    throw new ErrorResponse(StatusCodes.BAD_REQUEST, ERROR_MESSAGES.INVALID_ROLE)
+  }
+}
 export {
   createChannelService,
   inviteUserToChannelService,
   getChannelsService,
   getChannelMembersService,
   deleteMemberFromChannelService,
-  leaveChannelService
+  leaveChannelService,
+  updateRoleOfMemberInChannelService
 }

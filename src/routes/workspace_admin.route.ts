@@ -4,7 +4,8 @@ import {
   deleteUserInWorkspace,
   getAllChannels,
   getAllUserInWorkspace,
-  updateChannel
+  updateChannel,
+  updateRoleOfUserInWorkspace
 } from '~/controllers/workspace_admin.controller'
 import asyncErrorHandler from '~/helpers/async-error-handler'
 import authMiddleware from '~/middlewares/auth.middleware'
@@ -40,5 +41,11 @@ workspaceAdminRouter.delete(
   '/:workspaceId/users/:userId',
   asyncErrorHandler(checkPermission('delete_user_in_workspace')),
   asyncErrorHandler(deleteUserInWorkspace)
+)
+// update role of user => admin or member
+workspaceAdminRouter.patch(
+  '/:workspaceId/users/role',
+  asyncErrorHandler(checkPermission('update_user_in_workspace')),
+  asyncErrorHandler(updateRoleOfUserInWorkspace)
 )
 export default workspaceAdminRouter
