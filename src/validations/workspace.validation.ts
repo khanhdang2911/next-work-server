@@ -3,7 +3,7 @@ import Joi from 'joi'
 const validateCreateWorkspace = (data: object) => {
   const schema = Joi.object({
     name: Joi.string().min(3).max(30).required(),
-    description: Joi.string().optional(),
+    description: Joi.string().max(400).allow(null, '').optional(),
     image: Joi.string().optional()
   })
 

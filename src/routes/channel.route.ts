@@ -24,4 +24,9 @@ channelRouter.delete(
   asyncErrorHandler(channelController.deleteMemberFromChannel)
 )
 channelRouter.delete('/leave/:channelId', asyncErrorHandler(channelController.leaveChannel))
+channelRouter.patch(
+  '/:channelId/members/role',
+  checkPermission('update_channel_role_member'),
+  asyncErrorHandler(channelController.updateRoleOfMemberInChannel)
+)
 export default channelRouter

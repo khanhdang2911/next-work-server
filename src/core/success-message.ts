@@ -41,6 +41,7 @@ const SUCCESS_MESSAGES = {
   UPDATE_CHANNEL_SUCCESS: 'Update channel successfully.',
   DELETE_CHANNEL_SUCCESS: 'Delete channel successfully.',
   DELETE_USER_FROM_WORKSPACE_SUCCESS: 'Delete user from workspace successfully.',
+  UPDATE_USER_ROLE_SUCCESS: 'Update user role in workspace successfully.',
   //
   LEAVE_CHANNEL_SUCCESS: 'Leave channel successfully.'
 }

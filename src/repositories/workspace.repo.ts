@@ -43,7 +43,7 @@ const checkChannelInWorkspace = async (workspaceId: Types.ObjectId, channel: Typ
 const checkUserIsAdminOfWorkspace = async (workspaceId: Types.ObjectId, userId: Types.ObjectId) => {
   const checkUserExisted = await Workspace.exists({
     _id: workspaceId,
-    admin: userId
+    admin: { $elemMatch: { $eq: userId } }
   }).lean()
   return checkUserExisted
 }

@@ -7,22 +7,29 @@ const createConversationValidation = (data: object) => {
       .valid(...Object.values(CONVERSATION_TYPE))
       .required(),
     channelId: Joi.string().when('type', {
-      is: CONVERSATION_TYPE.CHATBOT || CONVERSATION_TYPE.DIRECT,
-      then: Joi.optional(),
-      otherwise: Joi.required()
+      is: CONVERSATION_TYPE.CHANNEL,
+      then: Joi.required(),
+      otherwise: Joi.optional()
     }),
     workspaceId: Joi.string().when('type', {
       is: CONVERSATION_TYPE.CHANNEL,
       then: Joi.optional(),
       otherwise: Joi.required()
     }),
-    participants: Joi.array()
-      .items(Joi.string())
-      .when('type', {
+    participants: Joi.alternatives().conditional('type', [
+      {
+        is: CONVERSATION_TYPE.CHANNEL,
+        then: Joi.forbidden()
+      },
+      {
         is: CONVERSATION_TYPE.CHATBOT,
-        then: Joi.array().items(Joi.string()).length(1).required(),
-        otherwise: Joi.array().items(Joi.string()).length(2).required()
-      })
+        then: Joi.array().items(Joi.string()).length(1).required()
+      },
+      {
+        is: Joi.valid(CONVERSATION_TYPE.DIRECT),
+        then: Joi.array().items(Joi.string()).length(2).required()
+      }
+    ])
   })
   return schema.validate(data)
 }

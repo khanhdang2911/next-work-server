@@ -18,7 +18,9 @@ const checkChannelIsExisted = async (channelId: Types.ObjectId) => {
 const checkUserIsAdminOfChannel = async (channelId: Types.ObjectId, userId: Types.ObjectId) => {
   return await Channel.exists({
     _id: channelId,
-    admin: userId
+    admin: {
+      $elemMatch: { $eq: userId }
+    }
   }).lean()
 }
 
