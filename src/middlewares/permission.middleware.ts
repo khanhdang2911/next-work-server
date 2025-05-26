@@ -88,9 +88,7 @@ const checkPermission = (action: string) => {
 
       if (CHANNEL_ADMIN_PERMS.has(action) && req.params.channelId) {
         await handleChannelAdminPermission(action, req.params.channelId, userId)
-      }
-
-      if (WORKSPACE_ADMIN_PERMS.has(action) && req.params.workspaceId) {
+      } else if (WORKSPACE_ADMIN_PERMS.has(action) && req.params.workspaceId) {
         await handleWorkspaceAdminPermission(action, req.params.workspaceId, userId)
       }
       next()

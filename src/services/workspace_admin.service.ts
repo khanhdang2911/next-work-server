@@ -10,6 +10,7 @@ import { Workspace } from '~/models/workspace.model'
 import { cleanedMessage, convertToObjectId } from '~/utils/common'
 import { validateCreateChannel } from '~/validations/channel.validation'
 import * as workspaceRepo from '~/repositories/workspace.repo'
+import { ROLES } from '~/constants/common.constant'
 
 const getAllChannelsService = async (workspaceId: string, limit: number, page: number, query: string = '') => {
   const queryRegex = new RegExp(query, 'i')
@@ -210,6 +211,7 @@ const updateRoleOfUserInWorkspaceService = async (
   }
   if (role === 'admin') {
     await Workspace.updateOne({ _id: wId }, { $addToSet: { admin: mId } })
+    await User.updateOne({ _id: mId }, { $addToSet: { roles: ROLES.WORKSPACE_ADMIN } })
   } else if (role === 'member') {
     await Workspace.updateOne({ _id: wId }, { $pull: { admin: mId } })
   } else {

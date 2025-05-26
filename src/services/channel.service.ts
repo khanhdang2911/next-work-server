@@ -9,7 +9,7 @@ import { User } from '~/models/user.model'
 import * as channelRepo from '~/repositories/channel.repo'
 import * as conversationService from '~/services/conversation.service'
 import { ConversationDTO } from '~/dtos/conversation.dto'
-import { CONVERSATION_TYPE } from '~/constants/common.constant'
+import { CONVERSATION_TYPE, ROLES } from '~/constants/common.constant'
 const createChannelService = async (userId: string, workspaceId: string, data: IChannel) => {
   const { error } = channelValidation.validateCreateChannel(data)
   if (error) {
@@ -225,6 +225,7 @@ const updateRoleOfMemberInChannelService = async (
   }
   if (role === 'admin') {
     await Channel.updateOne({ _id: cId }, { $addToSet: { admin: mId } })
+    await User.updateOne({ _id: mId }, { $addToSet: { roles: ROLES.CHANNEL_ADMIN } })
   } else if (role === 'member') {
     await Channel.updateOne({ _id: cId }, { $pull: { admin: mId } })
   } else {
