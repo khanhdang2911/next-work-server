@@ -61,5 +61,9 @@ const WorkspaceSchema = new Schema<IWorkspace>(
   }
 )
 
+WorkspaceSchema.index({ _id: 1, channelId: 1 }, { unique: true })
+WorkspaceSchema.index({ _id: 1, members: 1 }, { unique: true })
+WorkspaceSchema.index({ _id: 1, admin: 1 }, { unique: true })
+
 const Workspace = mongoose.model<IWorkspace>(DOCUMENT_NAME, WorkspaceSchema)
 export { Workspace, IWorkspace, IWorkspaceMember, IInviteUserData }

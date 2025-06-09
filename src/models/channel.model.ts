@@ -61,6 +61,9 @@ const ChannelSchema = new Schema<IChannel>(
     collection: COLLECTION_NAME
   }
 )
-
+ChannelSchema.index({ _id: 1, members: 1 }, { unique: true })
+ChannelSchema.index({ workspaceId: 1, members: 1 }, { unique: true })
+ChannelSchema.index({ _id: 1, workspaceId: 1 })
+ChannelSchema.index({ _id: 1, admin: 1 }, { unique: true })
 const Channel = mongoose.model<IChannel>(DOCUMENT_NAME, ChannelSchema)
 export { Channel, IChannel, IChannelMember }
