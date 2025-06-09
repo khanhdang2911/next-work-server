@@ -69,6 +69,6 @@ const MessageSchema = new Schema<IMessage>(
     collection: COLLECTION_NAME
   }
 )
-
+MessageSchema.index({ conversationId: 1, createdAt: -1 })
 const Message = mongoose.model<IMessage>(DOCUMENT_NAME, MessageSchema)
 export { Message, IMessage, IAttachment }
