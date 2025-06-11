@@ -1,4 +1,4 @@
-# 🛠 Internal Messaging System – Backend
+# 🛠 Nextwork – Backend
 
 This is the backend service for the Internal Messaging System, built with **Node.js** and **Express**. It provides APIs for user authentication, messaging, and group chat functionality.
 
